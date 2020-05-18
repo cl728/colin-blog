@@ -54,7 +54,8 @@
                                 <h3 class="ui teal header">博客</h3>
                             </div>
                             <div class="right aligned column">
-                                共 <h2 class="ui orange header m-inline-block m-text-thin"> {{total}} </h2> 篇
+                                共 <h2 class="ui orange header m-inline-block m-text-thin"><span v-text="total">24</span>
+                            </h2> 篇
                             </div>
                         </div>
                     </div>
@@ -69,13 +70,14 @@
                                         <span class="ui mini basic left pointing label"
                                               :class="[{orange : blog.flag === '转载'},
                                         {teal : blog.flag === '原创'},{blue : blog.flag === '翻译'}]">
-                                            {{blog.flag}}
+                                            <span v-text="blog.flag">原创</span>
                                         </span>
-                                        <a :href="'detail.html?id=' + blog.id" style="color: black">{{blog.title}}</a>
+                                        <a :href="'detail.html?id=' + blog.id" style="color: black" v-text="blog.title">Hello,
+                                            Blog!</a>
                                     </h3>
                                     <a class="m-text" :href="'detail.html?id=' + blog.id" style="color: black;">
-                                        {{blog.description.length > 80 ? blog.description.substr(0, 80) + "..." :
-                                        blog.description}}
+                                        <span v-text="blog.description.length > 80 ? blog.description.substr(0, 80) + '...' :
+                                        blog.description">loading...</span>
                                     </a>
                                     <div class="ui grid">
                                         <div class="eleven wide column">
@@ -83,21 +85,23 @@
                                                 <div class="item">
                                                     <img :src="blog.user.avatar" alt=""
                                                          class="ui avatar image">
-                                                    <div class="content"><a class="header">{{blog.user.nickname}}</a>
+                                                    <div class="content"><a class="header"><span
+                                                            v-text="blog.user.nickname">Colin</span></a>
                                                     </div>
                                                 </div>
                                                 <div class="item">
-                                                    <i class="calendar icon"></i> {{new Date(new
-                                                    Date(blog.createTime).getTime()).toLocaleString()}}
+                                                    <i class="calendar icon"></i> <span v-text="new Date(new
+                                                    Date(blog.createTime).getTime()).toLocaleString()">2020/5/17 上午9:53:24</span>
                                                 </div>
                                                 <div class="item">
-                                                    <i class="eye icon"></i> {{blog.views}}
+                                                    <i class="eye icon"></i> <span v-text="blog.views">24</span>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="right aligned five wide column">
                                             <a target="_blank" :href="'types.html?typeName=' + blog.type.name"
-                                               class="ui teal basic label m-padded-tiny m-text-thin">{{blog.type.name}}</a>
+                                               class="ui teal basic label m-padded-tiny m-text-thin"><span
+                                                    v-text="blog.type.name">Java</span></a>
                                         </div>
                                     </div>
                                 </div>
@@ -121,8 +125,7 @@
                                     </a>
                                     <a class="item" v-for="currPage in Math.min(5, totalPage)"
                                        :class="{active : index(currPage) === blogParams.page}"
-                                       @click="blogParams.page = index(currPage)">
-                                        {{index(currPage)}}
+                                       @click="blogParams.page = index(currPage)" v-text="index(currPage)">1
                                     </a>
                                     <a class="icon item" :class="{disabled : blogParams.page === totalPage}"
                                        @click="next()">
@@ -131,7 +134,8 @@
                                 </div>
                             </div>
                             <div class="right aligned column">
-                                共 <h2 class="ui orange header m-inline-block m-text-thin"> {{totalPage}} </h2> 页
+                                共 <h2 class="ui orange header m-inline-block m-text-thin"><span
+                                    v-text="totalPage">24</span></h2> 页
                             </div>
                         </div>
                     </div>
@@ -156,8 +160,9 @@
                             <div class="ui fluid vertical menu">
                                 <a :href="'types.html?id=' + type.id" target="_blank" class="item"
                                    v-for="(type, index) in types" :key="index">
-                                    {{type.name}}
-                                    <div class="ui teal basic left pointing label">{{type.blogList.length}}</div>
+                                    <span v-text="type.name">Java</span>
+                                    <div class="ui teal basic left pointing label"><span v-text="type.blogList.length">24</span>
+                                    </div>
                                 </a>
                             </div>
                         </div>
@@ -179,8 +184,8 @@
                             <a :href="'tags.html?id=' + tag.id" target="_blank"
                                class="ui teal basic left pointing label m-margin-tiny"
                                v-for="(tag, index) in tags" :key="index">
-                                {{tag.name}}
-                                <div class="detail">{{tag.blogList.length}}</div>
+                                <span v-text="tag.name">Java</span>
+                                <div class="detail"><span v-text="tag.blogList.length">24</span></div>
                             </a>
                         </div>
                     </div>
@@ -192,7 +197,7 @@
                         </div>
                         <div class="ui segment" v-for="(blog, index) in latestBlogList" :key="index">
                             <a :href="'detail.html?id=' + blog.id" target="_blank" class="m-black m-text-thin">
-                                《{{blog.title.length >= 14 ? blog.title.substr(0, 14) + "..." : blog.title }}》
+                                《<span v-text="blog.title.length >= 14 ? blog.title.substr(0, 14) + '...' : blog.title">Hello, Blog!</span>》
                             </a>
                         </div>
                     </div>

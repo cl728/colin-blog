@@ -11,7 +11,7 @@
                     {idea : link.name === '分类'},{tags : link.name === '标签'},
                     {clone : link.name === '归档'},{comment : link.name === '留言'},
                     {alternate : link.name === '留言'},{info : link.name === '关于本站'}]"
-                    ></i>{{link.name}}</a>
+                    ></i><span v-text="link.name">首页</span></a>
             </div>
         </div>
         <a href="#" class="ui menu toggle icon black button m-right-top m-mobile-show">

@@ -27,13 +27,16 @@
                 <div class="ui horizontal link list">
                     <div class="item">
                         <img :src="blog.user.avatar" alt="" class="ui avatar image">
-                        <div class="content"><a href="#" class="header">{{blog.user.nickname}}</a></div>
+                        <div class="content"><a class="header" v-text="blog.user.nickname">Colin</a></div>
                     </div>
                     <div class="item">
-                        <i class="calendar icon"></i> {{new Date(new Date(blog.createTime).getTime()).toLocaleString()}}
+                        <i class="calendar icon"></i>
+                        <span v-text="new Date(new Date(blog.createTime).getTime()).toLocaleString()">
+                            2020/5/13 下午8:57:09
+                        </span>
                     </div>
                     <div class="item">
-                        <i class="eye icon"></i> {{blog.views}}
+                        <i class="eye icon"></i> <span v-text="blog.views">24</span>
                     </div>
                 </div>
             </div>
@@ -45,11 +48,11 @@
             <div class="ui attached padded segment">
                 <!-- 标志：原创、转载等-->
                 <div class="ui right aligned basic segment">
-                    <div class="ui orange basic left pointing label">{{blog.flag}}</div>
+                    <div class="ui orange basic left pointing label"><span v-text="blog.flag">原创</span></div>
                 </div>
 
                 <!-- 标题 -->
-                <h2 class="ui center aligned header">{{blog.title}}</h2>
+                <h2 class="ui center aligned header" v-text="blog.title">Hello, Blog!</h2>
                 <br>
 
                 <!-- 正文 -->
@@ -60,8 +63,8 @@
                 <!-- 标签 -->
                 <div class="m-padded-lr-responsive">
                     <div class="ui basic teal right pointing label"
-                         v-for="(nick, index) in blog.nicks" :key="index">
-                        {{nick.name}}
+                         v-for="(tag, index) in blog.tags" :key="index">
+                        <span v-text="tag.name">Java</span>
                     </div>
                 </div>
 
@@ -95,8 +98,8 @@
                 <div class="ui center aligned grid">
                     <div class="twelve wide column">
                         <ul class="list">
-                            <li>作者：{{blog.user.nickname}}</li>
-                            <li>发表时间：{{new Date(new Date(blog.createTime).getTime()).toLocaleString()}}
+                            <li>作者：<span v-text="blog.user.nickname">Colin</span></li>
+                            <li>发表时间：<span v-text="new Date(new Date(blog.createTime).getTime()).toLocaleString()">2020/5/13 下午8:57:09</span>
                             </li>
                             <li>版权声明：著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</li>
                         </ul>
@@ -113,7 +116,7 @@
                 <div id="comment-list" tabindex="4" class="ui teal segment">
                     <div class="ui threaded comments" style="max-width: 100%;">
                         <h3 class="ui dividing header">评论(
-                            <span class="ui orange header m-inline-block m-text-thin">{{commentCount}}</span>
+                            <span class="ui orange header m-inline-block m-text-thin" v-text="commentCount">24</span>
                             )</h3>
                         <div class="comment" v-for="(comment, index) in commentList" :key="index">
                             <a class="avatar">
@@ -122,16 +125,19 @@
                             </a>
                             <div class="content">
                                 <a class="author">
-                                    <span>{{comment.nickname}}</span>
+                                    <span v-text="comment.nickname">Colin</span>
                                     <div class="ui mini basic teal left pointing label m-padded-mini"
                                          v-show="comment.adminComment">管理员
                                     </div>
                                 </a>
                                 <div class="metadata">
-                                    <span class="date">{{new Date(new Date(comment.createTime).getTime()).toLocaleString()}}</span>
+                                    <span class="date"
+                                          v-text="new Date(new Date(comment.createTime).getTime()).toLocaleString()">
+                                        2020/5/13 上午9:50:06
+                                    </span>
                                 </div>
                                 <div class="text">
-                                    {{comment.content}}
+                                    <span v-text="comment.content">loading...</span>
                                 </div>
                                 <div class="actions">
                                     <a class="reply" @click="reply(comment.nickname, comment.id)">回复</a>
@@ -147,22 +153,28 @@
                                     </a>
                                     <div class="content">
                                         <a class="author">
-                                            <span>{{replyComment.nickname}}</span>
+                                            <span v-text="replyComment.nickname">Colin</span>
                                             <div class="ui mini basic teal left pointing label m-padded-mini"
                                                  v-show="replyComment.adminComment">管理员
                                             </div>
                                             &nbsp;<span
-                                                style="color: teal;"> @{{replyComment.parentComment.nickname}}</span>
+                                                style="color: teal;"> @<span
+                                                v-text="replyComment.parentComment.nickname">Colin</span></span>
                                         </a>
                                         <div class="metadata">
-                                            <span class="date">{{new Date(new Date(replyComment.createTime).getTime()).toLocaleString()}}</span>
+                                            <span class="date"
+                                                  v-text="new Date(new Date(replyComment.createTime).getTime()).toLocaleString()">
+                                                2020/5/13 上午9:50:06
+                                            </span>
                                         </div>
                                         <div class="text">
-                                            {{replyComment.content}}
+                                            <span v-text="replyComment.content">loading...</span>
                                         </div>
                                         <div class="actions">
                                             <a class="reply" style="color: teal"
                                                @click="reply(replyComment.nickname, replyComment.id)">回复</a>
+                                            <a class="reply" style="color: teal" v-show="admin.nickname !== ''"
+                                               @click="delById(replyComment.id)">删除</a>
                                         </div>
                                     </div>
                                 </div>
@@ -191,7 +203,7 @@
                 </div>
             </div>
             <!-- 表单校验不通过的提示信息 -->
-            <div class="ui negative message" :class="{hidden : msg.length === 0}">{{msg}}</div>
+            <div class="ui negative message" :class="{hidden : msg.length === 0}" v-text="msg"></div>
         </div>
     </div>
 

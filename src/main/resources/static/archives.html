@@ -23,26 +23,28 @@
                     <h3 class="ui teal header">归档</h3>
                 </div>
                 <div class="right aligned column">
-                    共 <h2 class="ui orange header m-inline-block m-text-thin"> {{blogCount}} </h2> 篇
+                    共 <h2 class="ui orange header m-inline-block m-text-thin"><span v-text="blogCount">0</span></h2> 篇
                 </div>
             </div>
         </div>
 
         <!-- 博客标题列表 -->
         <div class="ui header" v-for="(dateBlog,index) in dateBlogList" :key="index">
-            <h2 class="ui center aligned header">{{dateBlog.date}}</h2>
+            <h2 class="ui center aligned header"><span v-text="dateBlog.date">2020</span></h2>
             <div class="ui fluid vertical menu">
                 <a :href="'detail.html?id=' + blog.id" target="_blank" class="item"
                    v-for="(blog, i) in dateBlog.blogList">
                     <span>
-                        <i class="teal circle icon"></i> 《{{blog.title}}》
+                        <i class="teal circle icon"></i> 《<span v-text="blog.title">Hello, Blog!</span>》
                         <div class="ui olive basic left pointing label m-padded-mini m-text-thin">
-                            {{new Date(new Date(blog.createTime).getTime()).toLocaleDateString().substr(5)}}
+                            <span v-text="new Date(new Date(blog.createTime).getTime()).toLocaleDateString().substr(5)">
+                                5/17
+                            </span>
                         </div>
                     </span>
                     <div class="ui basic left pointing label m-padded-mini m-text-thin"
                          :class="[{orange : blog.flag === '转载'}, {teal : blog.flag === '原创'}, {violet : blog.flag === '翻译'}]">
-                        {{blog.flag}}
+                        <span v-text="blog.flag">原创</span>
                     </div>
                 </a>
             </div>

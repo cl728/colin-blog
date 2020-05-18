@@ -46,9 +46,7 @@
                 </div>
 
                 <!-- 表单校验不通过的信息 -->
-                <div class="ui negative message">
-                    {{msg}}
-                </div>
+                <div class="ui negative message" :class="{hidden : msg.length === 0}" v-text="msg"></div>
 
                 <!-- 返回、保存、发布按钮 -->
                 <div class="ui right aligned container">

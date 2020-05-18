@@ -38,8 +38,8 @@
                 </thead>
                 <tbody>
                 <tr v-for="(type,index) in types" :key="index">
-                    <td>{{(page - 1) * 5 + index + 1}}</td>
-                    <td>{{type.name}}</td>
+                    <td v-text="(page - 1) * 5 + index + 1">1</td>
+                    <td v-text="type.name">Java</td>
                     <td>
                         <a @click="findById(type.id)" class="ui mini teal basic button">编辑</a>
                         <a @click="delById(type.id)" class="ui mini red basic button">删除</a>
@@ -54,8 +54,8 @@
                                 <i class="left chevron icon"></i>
                             </a>
                             <a class="item" v-for="currPage in Math.min(5, totalPage)"
-                               :class="{active : index(currPage) === page}" @click="page = index(currPage)">
-                                {{index(currPage)}}
+                               :class="{active : index(currPage) === page}" @click="page = index(currPage)"
+                               v-text="index(currPage)">1
                             </a>
                             <a class="icon item" :class="{disabled : page === totalPage}" @click="next()">
                                 <i class="right chevron icon"></i>
@@ -88,9 +88,7 @@
                 </div>
 
                 <!-- 表单校验不通过的信息 -->
-                <div class="ui negative message" :class="{hidden : msg.length === 0}">
-                    {{msg}}
-                </div>
+                <div class="ui negative message" :class="{hidden : msg.length === 0}" v-text="msg"></div>
 
                 <!-- 返回、保存、发布按钮 -->
                 <div class="ui right aligned container">

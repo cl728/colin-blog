@@ -43,9 +43,7 @@
                         <button type="button" class="ui fluid large teal button" @click="login($event)">登录</button>
                     </div>
 
-                    <div class="ui negative mini message" :class="{hidden : msg.length === 0}">
-                        {{msg}}
-                    </div>
+                    <div class="ui negative mini message" :class="{hidden : msg.length === 0}" v-text="msg"></div>
 
                 </form>
 

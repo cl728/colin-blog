@@ -25,7 +25,7 @@
                 <div id="message-list" tabindex="4" class="ui teal segment">
                     <div class="ui threaded comments" style="max-width: 100%;">
                         <h3 class="ui dividing header">留言(
-                            <span class="ui orange header m-inline-block m-text-thin">{{messageCount}}</span>
+                            <span class="ui orange header m-inline-block m-text-thin" v-text="messageCount">24</span>
                             )</h3>
                         <div class="comment" v-for="(message, index) in messageList" :key="index">
                             <a class="avatar">
@@ -34,16 +34,17 @@
                             </a>
                             <div class="content">
                                 <a class="author">
-                                    <span>{{message.nickname}}</span>
+                                    <span v-text="message.nickname">Colin</span>
                                     <div class="ui mini basic teal left pointing label m-padded-mini"
                                          v-show="message.adminMessage">管理员
                                     </div>
                                 </a>
                                 <div class="metadata">
-                                    <span class="date">{{new Date(new Date(message.createTime).getTime()).toLocaleString()}}</span>
+                                    <span class="date"
+                                          v-text="new Date(new Date(message.createTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</span>
                                 </div>
-                                <div class="text">
-                                    {{message.content}}
+                                <div class="text" v-text="message.content">
+                                    loading...
                                 </div>
                                 <div class="actions">
                                     <a class="reply" @click="reply(message.nickname, message.id)">回复</a>
@@ -59,18 +60,20 @@
                                     </a>
                                     <div class="content">
                                         <a class="author">
-                                            <span>{{replyMessage.nickname}}</span>
+                                            <span v-textx="replyMessage.nickname">Colin</span>
                                             <div class="ui mini basic teal left pointing label m-padded-mini"
                                                  v-show="replyMessage.adminMessage">管理员
                                             </div>
                                             &nbsp;<span
-                                                style="color: teal;"> @{{replyMessage.parentMessage.nickname}}</span>
+                                                style="color: teal;"> @<span
+                                                v-text="replyMessage.parentMessage.nickname">Colin</span></span>
                                         </a>
                                         <div class="metadata">
-                                            <span class="date">{{new Date(new Date(replyMessage.createTime).getTime()).toLocaleString()}}</span>
+                                            <span class="date"
+                                                  v-text="new Date(new Date(replyMessage.createTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</span>
                                         </div>
-                                        <div class="text">
-                                            {{replyMessage.content}}
+                                        <div class="text" v-text="replyMessage.content">
+                                            loading...
                                         </div>
                                         <div class="actions">
                                             <a class="reply"
@@ -105,7 +108,7 @@
                 </div>
             </div>
             <!-- 表单校验不通过的提示信息 -->
-            <div class="ui negative message" :class="{hidden : msg.length === 0}">{{msg}}</div>
+            <div class="ui negative message" :class="{hidden : msg.length === 0}" v-text="msg"></div>
         </div>
     </div>
 

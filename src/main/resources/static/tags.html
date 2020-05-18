@@ -24,7 +24,7 @@
                     <h3 class="ui teal header">标签</h3>
                 </div>
                 <div class="right aligned column">
-                    共 <h2 class="ui orange header m-inline-block m-text-thin"> {{tags.length}} </h2> 个
+                    共 <h2 class="ui orange header m-inline-block m-text-thin" v-text="tags.length"> 24 </h2> 个
                 </div>
             </div>
         </div>
@@ -33,9 +33,9 @@
             <div class="ui labeled button m-margin-tiny"
                  v-for="(tag, index) in tags" :key="index">
                 <button class="ui toggle button" :class="{active : search.tagNames.includes(tag.name)}"
-                        @click="changeSearchTagName(tag.name)">{{tag.name}}
+                        @click="changeSearchTagName(tag.name)" v-text="tag.name"> Java
                 </button>
-                <div class="ui basic teal left pointing label">{{tag.blogList.length}}</div>
+                <div class="ui basic teal left pointing label" v-text="tag.blogList.length">24</div>
             </div>
         </div>
 
@@ -49,16 +49,19 @@
                         <h3 class="ui header">
                                     <span class="ui mini basic left pointing label"
                                           :class="[{orange : blog.flag === '转载'},
-                                    {teal : blog.flag === '原创'},{blue : blog.flag === '翻译'}]">
-                                        {{blog.flag}}
+                                    {teal : blog.flag === '原创'},{blue : blog.flag === '翻译'}]" v-text="blog.flag">
+                                        原创
                                     </span>
-                            <a :href="'detail.html?id=' + blog.id" style="color: black">{{blog.title}}</a>
+                            <a :href="'detail.html?id=' + blog.id" style="color: black" v-text="blog.title">Hello,
+                                Blog!</a>
                         </h3>
                         <!-- 摘要 -->
-                        <a class="m-text" :href="'detail.html?id=' + blog.id" style="color: #000;">
-                            {{blog.description.length > 100 ? blog.description.substr(0, 100) + "..." :
-                            blog.description + "\n"}}
+                        <a class="m-text" :href="'detail.html?id=' + blog.id" style="color: #000;"
+                           v-text="blog.description.length > 100 ? blog.description.substr(0, 100) + '...' :
+                        blog.description">
+                            loading...
                         </a>
+                        <br v-if="blog.description.length < 50">
                         <!-- 相关信息 -->
                         <div class="ui stackable grid m-margin-top">
                             <div class="eleven wide column">
@@ -68,24 +71,25 @@
                                         <img :src="blog.user.avatar" alt=""
                                              class="ui avatar image">
                                         <!-- 昵称 -->
-                                        <div class="content"><a href="#" class="header">{{blog.user.nickname}}</a></div>
+                                        <div class="content"><a href="#" class="header" v-text="blog.user.nickname">Colin</a>
+                                        </div>
                                     </div>
                                     <!-- 发布时间 -->
                                     <div class="item">
-                                        <i class="calendar icon"></i> {{new Date(new
-                                        Date(blog.createTime).getTime()).toLocaleString()}}
+                                        <i class="calendar icon"></i> <span v-text="new Date(new
+                                        Date(blog.createTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</span>
                                     </div>
                                     <!-- 浏览次数 -->
                                     <div class="item">
-                                        <i class="eye icon"></i> {{blog.views}}
+                                        <i class="eye icon"></i> <span v-text="blog.views">24</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="right aligned five wide column">
                                 <div class="ui teal mini right pointing label"
                                      :class="{basic : !search.tagNames.includes(tag.name)}"
-                                     v-for="(tag, index) in blog.tags" :key="index">
-                                    {{tag.name}}
+                                     v-for="(tag, index) in blog.tags" :key="index" v-text="tag.name">
+                                    Java
                                 </div>
                             </div>
                         </div>
@@ -109,8 +113,8 @@
                         </a>
                         <a class="item" v-for="currPage in Math.min(5, totalPage)"
                            :class="{active : index(currPage) === search.page}"
-                           @click="search.page = index(currPage)">
-                            {{index(currPage)}}
+                           @click="search.page = index(currPage)" v-text="index(currPage)">
+                            1
                         </a>
                         <a class="icon item" :class="{disabled : search.page === totalPage}"
                            @click="next()">
@@ -119,7 +123,7 @@
                     </div>
                 </div>
                 <div class="right aligned column">
-                    共 <h2 class="ui orange header m-inline-block m-text-thin"> {{totalPage}} </h2> 页
+                    共 <h2 class="ui orange header m-inline-block m-text-thin" v-text="totalPage"> 24 </h2> 页
                 </div>
             </div>
         </div>

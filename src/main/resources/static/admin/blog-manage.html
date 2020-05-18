@@ -38,7 +38,8 @@
                         <select class="ui dropdown" v-model="search.typeName">
                             <option value="">分类名称</option>
                             <option value="all">所有分类</option>
-                            <option v-for="(type, index) in types" :key="index" :value="type.name">{{type.name}}
+                            <option v-for="(type, index) in types" :key="index" :value="type.name" v-text="type.name">
+                                Java
                             </option>
                         </select>
                     </div>
@@ -66,11 +67,11 @@
                 </thead>
                 <tbody>
                 <tr v-for="(b, index) in blogList" :key="index">
-                    <td>{{(search.page - 1) * 5 + index + 1}}</td>
-                    <td>{{b.title}}</td>
-                    <td>{{b.type.name}}</td>
-                    <td>{{b.published ? "是" : "否"}}</td>
-                    <td>{{new Date(new Date(b.updateTime).getTime()).toLocaleString()}}</td>
+                    <td v-text="(search.page - 1) * 5 + index + 1">1</td>
+                    <td v-text="b.title">Hello, Blog!</td>
+                    <td v-text="b.type.name">Java</td>
+                    <td v-text="b.published ? '是' : '否'">否</td>
+                    <td v-text="new Date(new Date(b.updateTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</td>
                     <td>
                         <a :href="'blog-publish.html?id=' + b.id" class="ui mini teal basic button">编辑</a>
                         <a @click="delById(b.id)" class="ui mini red basic button">删除</a>
@@ -88,8 +89,8 @@
                             </a>
                             <a class="item" v-for="currPage in Math.min(5, totalPage)"
                                :class="{active : index(currPage) === search.page}"
-                               @click="search.page = index(currPage)">
-                                {{index(currPage)}}
+                               @click="search.page = index(currPage)" v-text="index(currPage)">
+                                1
                             </a>
                             <a class="icon item" :class="{disabled : search.page === totalPage}" @click="next()">
                                 <i class="right chevron icon"></i>

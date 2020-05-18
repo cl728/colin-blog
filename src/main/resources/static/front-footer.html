@@ -4,7 +4,8 @@
             <div class="three wide column">
                 <div class="ui inverted link list">
                     <div class="item">
-                        <img src="http://134.175.237.101/group1/M00/00/00/rBAADl7Ah6OAaHqyAAC4V_dRNqY370.png" class="ui rounded image" alt="" style="width: 110px;">
+                        <img src="http://134.175.237.101/group1/M00/00/00/rBAADl7Ah6OAaHqyAAC4V_dRNqY370.png"
+                             class="ui rounded image" alt="" style="width: 110px;">
                     </div>
                 </div>
             </div>
@@ -13,7 +14,7 @@
                 <div class="ui inverted link list">
                     <a :href="'detail.html?id='+ blog.id" class="item"
                        v-for="(blog, index) in blogList" :key="index">
-                        《{{blog.title.length >= 14 ? blog.title.substr(0, 14) + "..." : blog.title }}》
+                        《<span v-text="blog.title.length >= 14 ? blog.title.substr(0, 14) + '...' : blog.title">Hello, Blog!</span>》
                     </a>
                 </div>
             </div>

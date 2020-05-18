@@ -11,13 +11,13 @@
                        :class="[{home : link.name === '博客'},{idea : link.name === '分类'},
                         {tags : link.name === '标签'},{camera : link.name === '图片'},
                         {comment : link.name === '消息'}, {alternate : link.name === '消息'}]"
-                    ></i>{{link.name}}
+                    ></i><span v-text="link.name">博客</span>
                 </a>
                 <div class="right m-item m-mobile-hide menu">
                     <div class="ui dropdown item">
                         <div class="text">
                             <img :src="user.avatar" alt="" class="ui avatar image">
-                            {{user.nickname}}
+                            <span v-text="user.nickname">Colin</span>
                         </div>
                         <i class="dropdown icon"></i>
                         <div class="menu">
