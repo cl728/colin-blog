@@ -1,6 +1,6 @@
 ## colin-blog
 ### 个人博客网 1.0.0（SpringBoot + Vue）
-本站是基于b站开源教程 [springBoot开发一个小而美的个人博客详细教程](https://www.bilibili.com/video/BV1nE411r7TF?p=1) 的二次开发。
+本站是基于b站开源教程 [SpringBoot开发一个小而美的个人博客详细教程](https://www.bilibili.com/video/BV1nE411r7TF?p=1) 的二次开发。
 前台展示页面**新增留言板块**，后台管理页面**新增图片管理和消息管理**，并于自己的服务器上搭建 **FastDFS 文件管理系统**，用于存储发布博客上传的图片。
 
 ### 所用技术栈
