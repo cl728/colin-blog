@@ -7,7 +7,7 @@
 - 前端：
 	- semantic-ui框架：页面布局
 	- JQuery：插件集成、动画效果
-	- **Vue**：后台数据渲染
+	- **Vue**：后台数据渲染 
 	- **axios**：前后端数据交互
 - 后端：
 	- SpringBoot 2.2.5.RELEASE
