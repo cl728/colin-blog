@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>留言板</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="css/typo.css">
+    <link rel="stylesheet" href="css/me.css">
+</head>
+
+
+<body>
+<!-- 导航 -->
+<div id="header"></div>
+
+<div id="app">
+    <!-- 中间部分 -->
+    <div class="m-container-small m-padded-tb-big">
+        <div class="ui container">
+            <!-- 留言区域 -->
+            <div class="ui bottom attached segment">
+                <!-- 留言区域列表 -->
+                <div id="message-list" tabindex="4" class="ui teal segment">
+                    <div class="ui threaded comments" style="max-width: 100%;">
+                        <h3 class="ui dividing header">留言(
+                            <span class="ui orange header m-inline-block m-text-thin">{{messageCount}}</span>
+                            )</h3>
+                        <div class="comment" v-for="(message, index) in messageList" :key="index">
+                            <a class="avatar">
+                                <img :src="message.avatar" class="ui avatar image"
+                                     style="border-radius: 5rem;">
+                            </a>
+                            <div class="content">
+                                <a class="author">
+                                    <span>{{message.nickname}}</span>
+                                    <div class="ui mini basic teal left pointing label m-padded-mini"
+                                         v-show="message.adminMessage">管理员
+                                    </div>
+                                </a>
+                                <div class="metadata">
+                                    <span class="date">{{new Date(new Date(message.createTime).getTime()).toLocaleString()}}</span>
+                                </div>
+                                <div class="text">
+                                    {{message.content}}
+                                </div>
+                                <div class="actions">
+                                    <a class="reply" @click="reply(message.nickname, message.id)">回复</a>
+                                    <a class="reply" v-show="admin.nickname != ''" style="color: teal"
+                                       @click="delById(message.id)">删除</a>
+                                </div>
+                            </div>
+                            <div class="comments" v-show="message.replyMessages.length > 0">
+                                <div class="comment" v-for="(replyMessage, index) in message.replyMessages">
+                                    <a class="avatar">
+                                        <img :src="replyMessage.avatar" class="ui avatar image"
+                                             style="border-radius: 5rem;">
+                                    </a>
+                                    <div class="content">
+                                        <a class="author">
+                                            <span>{{replyMessage.nickname}}</span>
+                                            <div class="ui mini basic teal left pointing label m-padded-mini"
+                                                 v-show="replyMessage.adminMessage">管理员
+                                            </div>
+                                            &nbsp;<span
+                                                style="color: teal;"> @{{replyMessage.parentMessage.nickname}}</span>
+                                        </a>
+                                        <div class="metadata">
+                                            <span class="date">{{new Date(new Date(replyMessage.createTime).getTime()).toLocaleString()}}</span>
+                                        </div>
+                                        <div class="text">
+                                            {{replyMessage.content}}
+                                        </div>
+                                        <div class="actions">
+                                            <a class="reply"
+                                               @click="reply(replyMessage.nickname, replyMessage.id)">回复</a>
+                                            <a class="reply" v-show="admin.nickname != ''" style="color: teal"
+                                               @click="delById(replyMessage.id)">删除</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 提交留言 -->
+                <div id="message-form" tabindex="4" class="ui form">
+                    <div class="field">
+                        <textarea id="messageContent" placeholder="写下你想说的话吧..."></textarea>
+                    </div>
+                    <div class="fields">
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" placeholder="昵称" v-model="message.nickname">
+                            </div>
+                        </div>
+                        <div class="field m-margin-bottom-small m-mobile-wide">
+                            <button class="ui teal button m-mobile-wide" @click="publishMessage()"><i
+                                    class="edit icon"></i> 发布评论
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 表单校验不通过的提示信息 -->
+            <div class="ui negative message" :class="{hidden : msg.length === 0}">{{msg}}</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 底部 -->
+<div id="footer"></div>
+
+<script src="lib/jquery/jquery-3.3.1.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+<script src="lib/highlight/highlight.pack.js"></script>
+<script src="lib/highlight/highlightjs-line-numbers.js"></script>
+<script src="lib/tocbot/tocbot.min.js"></script>
+<script src="lib/qrcode/qrcode.min.js"></script>
+<script src="lib/waypoints/jquery.waypoints.min.js"></script>
+<script src="js/front-include.js"></script>
+<script src="js/vuejs-2.5.16.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data: {
+            message: {
+                avatar: "https://picsum.photos/id/777/100/100",
+                nickname: "",
+                content: "",
+                parentMessageId: -1
+            },
+            msg: "",
+            messageList: [],
+            isChange: false,
+            messageCount: 0,
+            admin: {
+                nickname: ""
+            }
+        },
+        created() {
+            axios.get("/messages").then(({data}) => {
+                this.messageList = data;
+            }).catch();
+            axios.get("/messages/count").then(({data}) => {
+                this.messageCount = data;
+            }).catch();
+            axios.get("/users").then(({data}) => {
+                this.admin = data;
+                this.message.nickname = this.admin.nickname;
+            }).catch();
+        },
+        watch: {
+            isChange: {
+                handler() {
+                    axios.get("/messages").then(({data}) => {
+                        this.messageList = data;
+                    }).catch(() => {
+                        this.messageList = [];
+                    });
+                    axios.get("/messages/count").then(({data}) => {
+                        this.messageCount = data;
+                    }).catch(() => {
+                        this.messageCount = 0;
+                    });
+                }
+            },
+            nickname() {
+                let randomAvatarId = Math.floor((Math.random() * 1000 + 84));
+                axios.get("https://picsum.photos/id/" + randomAvatarId + "/100/100").then(() => {
+                    this.message.avatar = "https://picsum.photos/id/" + randomAvatarId + "/100/100";
+                }).catch(() => {
+                    this.message.avatar = "https://picsum.photos/id/777/100/100";
+                });
+            }
+        },
+        computed: {
+            nickname() {
+                return this.message.nickname;
+            }
+        },
+        methods: {
+            checkNickname() {
+                //1.定义校验规则
+                const reg_nickname = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_nickname.test(this.message.nickname);
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "请输入您的昵称！"
+                }
+                return flag;
+            },
+            checkContent() {
+                //1.定义校验规则
+                const reg_content = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_content.test($("#messageContent").val().trim());
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "请输入留言！"
+                }
+                return flag;
+            },
+            publishMessage() {
+                if (this.checkContent() && this.checkNickname()) {
+                    this.message.content = $("#messageContent").val().trim();
+                    this.message.createTime = new Date();
+                    axios.post("/messages", this.message).then(() => {
+                        this.isChange = !this.isChange;
+                        this.clear();
+                    }).catch(() => {
+                        console.log("fail post...");
+                    });
+                }
+            },
+            reply(nickname, id) {
+                $("#messageContent").attr("placeholder", "@" + nickname + ": ");
+                this.message.parentMessageId = id;
+                document.querySelector('#message-form').focus();
+            },
+            delById(id) {
+                if (confirm("该留言下的所有回复都会被删除，您确定要删除此留言吗？")) {
+                    axios.delete("/admin/messages/" + id).then(() => {
+                        this.isChange = !this.isChange;
+                    }).catch();
+                }
+            },
+            clear() {
+                $("#messageContent").val('');
+                this.message.parentMessageId = -1;
+                $("#messageContent").attr("placeholder", "请输入留言...");
+            }
+        }
+    })
+</script>
+
+<script>
+    // 顶部菜单样式切换
+    $('.menu.toggle').click(function () {
+        $('.m-item').toggleClass('m-mobile-hide');
+    });
+</script>
+
+
+</body>
+
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消息管理</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="../css/me.css">
+</head>
+
+
+<body>
+<div id="app">
+    <!-- 引入导航 -->
+    <header id="header"></header>
+    <div class="ui attached pointing menu">
+        <div class="ui container">
+            <div class="right menu">
+                <a href="comment-manage.html" class="item grey active">评论管理</a>
+                <a href="message-manage.html" class="item">留言管理</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 中间部分 -->
+    <div class="m-container-small m-padded-tb-big">
+        <div class="ui container">
+            <!-- 搜索表单 -->
+            <form class="ui segment form">
+                <div class="inline fields">
+                    <!-- 博客id-title下拉列表 -->
+                    <div class="field">
+                        <select class="ui dropdown" v-model="search.blogId">
+                            <option value="">博客 id - title</option>
+                            <option value="-1">所有博客</option>
+                            <option v-for="(blog, index) in blogs" :key="index" :value="blog.id">
+                                {{blog.id + ' - ' + blog.title}}
+                            </option>
+                        </select>
+                    </div>
+                    <!-- 是否过滤管理员评论 -->
+                    <div class="field">
+                        <div class="ui checkbox">
+                            <input type="checkbox" id="filterAdminComment" v-model="search.filterAdminComment">
+                            <label for="filterAdminComment">过滤管理员评论</label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <!-- 表格 -->
+            <table class="ui celled center aligned table">
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>所属博客id</th>
+                    <th>评论内容</th>
+                    <th>是否为管理员评论</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(comment, index) in comments" :key="index">
+                    <td>{{(page - 1) * 5 + index + 1}}</td>
+                    <td>{{comment.blog.id}}</td>
+                    <td>{{comment.content}}</td>
+                    <td>{{comment.adminComment ? '是' : '否'}}</td>
+                    <td>
+                        <a @click="delById(comment.id)" class="ui mini red basic button">删除</a>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr v-show="comments.length != 0">
+                    <th colspan="5">
+                        <div class="ui mini left floated pagination menu">
+                            <a class="icon item" :class="{disabled : page === 1}" @click="prev()">
+                                <i class="left chevron icon"></i>
+                            </a>
+                            <a class="item" v-for="currPage in Math.min(5, totalPage)"
+                               :class="{active : index(currPage) === page}" @click="page = index(currPage)">
+                                {{index(currPage)}}
+                            </a>
+                            <a class="icon item" :class="{disabled : page === totalPage}" @click="next()">
+                                <i class="right chevron icon"></i>
+                            </a>
+                        </div>
+                    </th>
+                </tr>
+                <!-- 加载器 -->
+                <tr v-show="comments.length === 0">
+                    <th colspan="5">
+                        <div class="ui active centered inline loader"></div>
+                    </th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+
+    <br>
+    <br>
+    <br>
+
+    <!-- 引入底部 -->
+    <footer id="footer"></footer>
+</div>
+
+
+<script src="../lib/jquery/jquery-3.3.1.js"></script>
+<script src="../lib/semantic-ui/semantic.min.js"></script>
+<script src="../js/vuejs-2.5.16.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script src="../js/manage-include.js"></script>
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            page: 1,
+            totalPage: 1,   // 总页码数
+            total: 0,       // 总记录数
+            comments: [],
+            blogs: [],
+            search: {
+                page: 1,
+                blogId: null,
+                filterAdminComment: null
+            }
+        },
+        created() {
+            axios.get("/comments/page", {
+                params: {
+                    page: this.search.page
+                }
+            }).then(({data}) => {
+                this.comments = data.items;
+                this.totalPage = data.totalPage;
+                this.total = data.total;
+            }).catch();
+            axios.get("/blogs").then(({data}) => {
+                this.blogs = data;
+            }).catch();
+        },
+        watch: {
+            search: {
+                deep: true,
+                handler() {
+                    axios.get("/comments/page", {
+                        params: {
+                            page: this.search.page,
+                            blogId: this.search.blogId,
+                            filterAdminComment: this.search.filterAdminComment
+                        }
+                    }).then(({data}) => {
+                        this.comments = data.items;
+                        this.totalPage = data.totalPage;
+                        this.total = data.total;
+                    }).catch(() => {
+                        this.comments = [];
+                        this.totalPage = data.totalPage;
+                        this.total = data.total;
+                    });
+                }
+            }
+        },
+        methods: {
+            prev() {
+                if (this.search.page > 1) {
+                    this.search.page -= 1;
+                }
+            },
+            next() {
+                if (this.search.page < this.totalPage) {
+                    this.search.page += 1;
+                }
+            },
+            index(i) {
+                if (this.totalPage <= 5 || this.search.page <= 3) { //前五页
+                    return i;
+                } else if (this.search.page > this.totalPage - 3) { //后五页
+                    return this.totalPage - 5 + i;
+                } else { //中间的页码
+                    return this.search.page - 3 + i;
+                }
+            },
+            delById(id) {
+                if (confirm("您确定要删除此评论吗？")) {
+                    axios.delete("/admin/comments/" + id).then(() => {
+                        location.href = "comment-manage.html";
+                    }).catch();
+                }
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新增分类</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="../lib/editormd/css/editormd.min.css">
+    <link rel="stylesheet" href="../css/me.css">
+</head>
+
+
+<body>
+<div id="app">
+    <!-- 引入导航 -->
+    <div id="header"></div>
+    <!--二级导航-->
+    <div class="ui attached pointing menu">
+        <div class="ui container">
+            <div class="right menu">
+                <a href="type-manage.html" class="item">分类管理</a>
+                <a href="type-publish.html" class="item grey active">新增分类</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 中间部分 -->
+    <div class="m-container-small m-padded-tb-big">
+        <div class="ui container">
+            <form class="ui form">
+                <!-- 分类名称输入框 -->
+                <div class="field">
+                    <div class="ui left labeled input">
+                        <label class="ui teal basic label">分类</label>
+                        <input type="text" name="name" placeholder="分类名称" v-model="type.name">
+                    </div>
+                </div>
+
+                <!-- 表单校验不通过的信息 -->
+                <div class="ui negative message" :class="{hidden : msg.length === 0}">
+                    {{msg}}
+                </div>
+
+                <!-- 返回、保存、发布按钮 -->
+                <div class="ui right aligned container">
+                    <button type="button" class="ui button" onclick="window.history.go(-1)">返回</button>
+                    <button type="button" class="ui teal button" @click="save">提交</button>
+                </div>
+
+
+            </form>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <!-- 底部 -->
+    <div id="footer"></div>
+</div>
+
+
+<script src="../lib/jquery/jquery-3.3.1.js"></script>
+<script src="../lib/semantic-ui/semantic.min.js"></script>
+<script src="../lib/editormd/editormd.min.js"></script>
+<script src="../js/vuejs-2.5.16.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script src="../js/manage-include.js"></script>
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            msg: "",
+            type: {
+                name: ""
+            }
+        },
+        methods: {
+            save() {
+                if (this.checkTypeName()) {
+                    axios.post("/admin/types", this.type).then(() => {
+                        location.href = "type-manage.html";
+                    }).catch(() => {
+                        this.msg = "操作失败！"
+                    });
+                }
+            },
+            checkTypeName() {
+                //1.定义校验规则
+                const reg_typeName = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_typeName.test(this.type.name);
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "分类名称不能为空！"
+                }
+                return flag;
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

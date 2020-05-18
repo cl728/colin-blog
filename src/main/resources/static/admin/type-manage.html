@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分类管理</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="../css/me.css">
+</head>
+
+
+<body>
+<div id="app">
+    <!-- 引入导航 -->
+    <div id="header"></div>
+    <!--二级导航-->
+    <div class="ui attached pointing menu">
+        <div class="ui container">
+            <div class="right menu">
+                <a href="type-manage.html" class="item grey active">分类管理</a>
+                <a href="type-publish.html" class="item">新增分类</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 中间部分 -->
+    <div class="m-container-small m-padded-tb-big">
+        <div class="ui container">
+            <!-- 表格 -->
+            <table class="ui celled center aligned table">
+                <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>名称</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(type,index) in types" :key="index">
+                    <td>{{(page - 1) * 5 + index + 1}}</td>
+                    <td>{{type.name}}</td>
+                    <td>
+                        <a @click="findById(type.id)" class="ui mini teal basic button">编辑</a>
+                        <a @click="delById(type.id)" class="ui mini red basic button">删除</a>
+                    </td>
+                </tr>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <th colspan="6">
+                        <div class="ui mini left floated pagination menu">
+                            <a class="icon item" :class="{disabled : page === 1}" @click="prev()">
+                                <i class="left chevron icon"></i>
+                            </a>
+                            <a class="item" v-for="currPage in Math.min(5, totalPage)"
+                               :class="{active : index(currPage) === page}" @click="page = index(currPage)">
+                                {{index(currPage)}}
+                            </a>
+                            <a class="icon item" :class="{disabled : page === totalPage}" @click="next()">
+                                <i class="right chevron icon"></i>
+                            </a>
+                        </div>
+                        <a href="type-publish.html" class="ui mini right floated teal basic button">新增</a>
+                    </th>
+                </tr>
+                </tfoot>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!--模态框-->
+    <div class="ui modal">
+        <i class="close icon"></i>
+        <div class="header">
+            修改分类名称
+        </div>
+        <div class="ui container content">
+            <form class="ui form">
+                <!-- 分类名称输入框 -->
+                <div class="field">
+                    <div class="ui left labeled input">
+                        <label class="ui teal basic label">分类</label>
+                        <input type="text" name="name" placeholder="分类名称" v-model="type.name">
+                    </div>
+                </div>
+
+                <!-- 表单校验不通过的信息 -->
+                <div class="ui negative message" :class="{hidden : msg.length === 0}">
+                    {{msg}}
+                </div>
+
+                <!-- 返回、保存、发布按钮 -->
+                <div class="ui right aligned container">
+                    <button type="button" class="ui button" onclick="window.history.go(-1)">返回列表</button>
+                    <button type="button" class="ui teal button" @click="update()">提交更改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <!-- 引入底部 -->
+    <div id="footer"></div>
+</div>
+
+
+<script src="../lib/jquery/jquery-3.3.1.js"></script>
+<script src="../lib/semantic-ui/semantic.min.js"></script>
+<script src="../js/vuejs-2.5.16.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script src="../js/manage-include.js"></script>
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            msg: "",
+            type: {
+                name: ""
+            },
+            page: 1,
+            totalPage: 1,   // 总页码数
+            total: 0,       // 总记录数
+            types: []
+        },
+        created() {
+            axios.get("/types/page", {
+                params: {
+                    page: this.page
+                }
+            }).then(({data}) => {
+                this.types = data.items;
+                this.totalPage = data.totalPage;
+                this.total = data.total;
+            }).catch()
+        },
+        watch: {
+            page: {
+                handler(newVal, oldVal) {
+                    if (!oldVal) {
+                        return;
+                    }
+                    axios.get("/types/page", {
+                        params: {
+                            page: this.page
+                        }
+                    }).then(({data}) => {
+                        this.types = data.items;
+                    }).catch();
+                }
+            }
+        },
+        methods: {
+            prev() {
+                if (this.page > 1) {
+                    this.page -= 1;
+                }
+            },
+            next() {
+                if (this.page < this.totalPage) {
+                    this.page += 1;
+                }
+            },
+            index(i) {
+                if (this.totalPage <= 5 || this.page <= 3) { //前五页
+                    return i;
+                } else if (this.page > this.totalPage - 3) { //后五页
+                    return this.totalPage - 5 + i;
+                } else { //中间的页码
+                    return this.page - 3 + i;
+                }
+            },
+            delById(id) {
+                if (confirm("您确定要删除此分类吗？")) {
+                    axios.delete("/admin/types/" + id).then(() => {
+                        location.href = "type-manage.html";
+                    }).catch();
+                }
+            },
+            findById(id) {
+                axios.get("/types/id/" + id).then(({data}) => {
+                    this.type = data;
+                    $('.ui.modal').modal("show");
+                }).catch();
+            },
+            update() {
+                if (this.checkTypeName()) {
+                    axios.put("/admin/types", this.type).then(() => {
+                        location.href = "type-manage.html";
+                    }).catch(() => {
+                        this.msg = "操作失败！此分类名称已经存在！"
+                    });
+                }
+            },
+            checkTypeName() {
+                //1.定义校验规则
+                const reg_typeName = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_typeName.test(this.type.name);
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "分类名称不能为空！"
+                }
+                return flag;
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

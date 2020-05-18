@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客详情页</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="css/typo.css">
+    <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="lib/highlight/tomorrow-night.css">
+    <link rel="stylesheet" href="lib/tocbot/tocbot.css">
+    <link rel="stylesheet" href="css/me.css">
+</head>
+
+
+<body>
+<!-- 导航 -->
+<div id="header"></div>
+
+<div id="app">
+    <!-- 中间部分 -->
+    <div id="waypoint" class="m-container-small m-padded-tb-big animated fadeIn">
+        <div class="ui container">
+            <!-- 头部 -->
+            <div class="ui top attached segment">
+                <div class="ui horizontal link list">
+                    <div class="item">
+                        <img :src="blog.user.avatar" alt="" class="ui avatar image">
+                        <div class="content"><a href="#" class="header">{{blog.user.nickname}}</a></div>
+                    </div>
+                    <div class="item">
+                        <i class="calendar icon"></i> {{new Date(new Date(blog.createTime).getTime()).toLocaleString()}}
+                    </div>
+                    <div class="item">
+                        <i class="eye icon"></i> {{blog.views}}
+                    </div>
+                </div>
+            </div>
+            <!-- 首图区域 -->
+            <div class="ui attached segment">
+                <img :src="blog.firstPicture" alt="" class=" ui fluid rounded image">
+            </div>
+            <!-- 博客内容 -->
+            <div class="ui attached padded segment">
+                <!-- 标志：原创、转载等-->
+                <div class="ui right aligned basic segment">
+                    <div class="ui orange basic left pointing label">{{blog.flag}}</div>
+                </div>
+
+                <!-- 标题 -->
+                <h2 class="ui center aligned header">{{blog.title}}</h2>
+                <br>
+
+                <!-- 正文 -->
+                <div id="content" v-html="blog.content"
+                     class="typo typo-selection js-toc-content m-padded-lr-responsive m-padded-tb-large">
+                </div>
+
+                <!-- 标签 -->
+                <div class="m-padded-lr-responsive">
+                    <div class="ui basic teal right pointing label"
+                         v-for="(nick, index) in blog.nicks" :key="index">
+                        {{nick.name}}
+                    </div>
+                </div>
+
+                <!-- 赞赏 -->
+                <!-- 赞赏按钮 -->
+                <div class="ui center aligned basic segment" v-show="blog.appreciation">
+                    <button id="payButton" class="ui orange basic circular button">赞赏</button>
+                </div>
+                <!-- 显示的支付二维码 -->
+                <div class="ui payQR flowing popup transition hidden">
+                    <div class="ui orange basic label">
+                        <div class="ui images" style="font-size: inherit !important;">
+                            <div class="image">
+                                <img src="http://134.175.237.101/group1/M00/00/00/rBAADl7AjNmASjKcAABRqVO947k902.png"
+                                     alt="" class="ui rounded bordered image"
+                                     style="width: 120px;">
+                                <div>支付宝</div>
+                            </div>
+                            <div class="image">
+                                <img src="http://134.175.237.101/group1/M00/00/00/rBAADl7AjPOAOftEAAA5-qOMm4A444.png"
+                                     alt="" class="ui rounded bordered image"
+                                     style="width: 120px;">
+                                <div>微信</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 转载声明 -->
+            <div class="ui attached positive message" v-show="blog.shareStatement">
+                <div class="ui center aligned grid">
+                    <div class="twelve wide column">
+                        <ul class="list">
+                            <li>作者：{{blog.user.nickname}}</li>
+                            <li>发表时间：{{new Date(new Date(blog.createTime).getTime()).toLocaleString()}}
+                            </li>
+                            <li>版权声明：著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</li>
+                        </ul>
+                    </div>
+                    <div class="four wide column">
+                        <!-- <img src="images/wechat.png" alt="" class="ui right floated rounded bordered image"
+                              style="width: 110px;">-->
+                    </div>
+                </div>
+            </div>
+            <!-- 留言区域 -->
+            <div class="ui bottom attached segment" v-show="blog.commentAble">
+                <!-- 留言区域列表 -->
+                <div id="comment-list" tabindex="4" class="ui teal segment">
+                    <div class="ui threaded comments" style="max-width: 100%;">
+                        <h3 class="ui dividing header">评论(
+                            <span class="ui orange header m-inline-block m-text-thin">{{commentCount}}</span>
+                            )</h3>
+                        <div class="comment" v-for="(comment, index) in commentList" :key="index">
+                            <a class="avatar">
+                                <img :src="comment.avatar" class="ui avatar image"
+                                     style="border-radius: 5rem;">
+                            </a>
+                            <div class="content">
+                                <a class="author">
+                                    <span>{{comment.nickname}}</span>
+                                    <div class="ui mini basic teal left pointing label m-padded-mini"
+                                         v-show="comment.adminComment">管理员
+                                    </div>
+                                </a>
+                                <div class="metadata">
+                                    <span class="date">{{new Date(new Date(comment.createTime).getTime()).toLocaleString()}}</span>
+                                </div>
+                                <div class="text">
+                                    {{comment.content}}
+                                </div>
+                                <div class="actions">
+                                    <a class="reply" @click="reply(comment.nickname, comment.id)">回复</a>
+                                    <a class="reply" style="color: teal" v-show="admin.nickname !== ''"
+                                       @click="delById(comment.id)">删除</a>
+                                </div>
+                            </div>
+                            <div class="comments" v-show="comment.replyComments.length > 0">
+                                <div class="comment" v-for="(replyComment, index) in comment.replyComments">
+                                    <a class="avatar">
+                                        <img :src="replyComment.avatar" class="ui avatar image"
+                                             style="border-radius: 5rem;">
+                                    </a>
+                                    <div class="content">
+                                        <a class="author">
+                                            <span>{{replyComment.nickname}}</span>
+                                            <div class="ui mini basic teal left pointing label m-padded-mini"
+                                                 v-show="replyComment.adminComment">管理员
+                                            </div>
+                                            &nbsp;<span
+                                                style="color: teal;"> @{{replyComment.parentComment.nickname}}</span>
+                                        </a>
+                                        <div class="metadata">
+                                            <span class="date">{{new Date(new Date(replyComment.createTime).getTime()).toLocaleString()}}</span>
+                                        </div>
+                                        <div class="text">
+                                            {{replyComment.content}}
+                                        </div>
+                                        <div class="actions">
+                                            <a class="reply" style="color: teal"
+                                               @click="reply(replyComment.nickname, replyComment.id)">回复</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 提交留言 -->
+                <div id="comment-form" tabindex="4" class="ui form">
+                    <div class="field">
+                        <textarea id="commentContent" placeholder="请输入评论信息..."></textarea>
+                    </div>
+                    <div class="fields">
+                        <div class="field m-mobile-wide m-margin-bottom-small">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" placeholder="昵称" v-model="comment.nickname">
+                            </div>
+                        </div>
+                        <div class="field m-margin-bottom-small m-mobile-wide">
+                            <button class="ui teal button m-mobile-wide" @click="publishComment()"><i
+                                    class="edit icon"></i> 发布评论
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 表单校验不通过的提示信息 -->
+            <div class="ui negative message" :class="{hidden : msg.length === 0}">{{msg}}</div>
+        </div>
+    </div>
+
+    <!-- 右下角的生成目录、跳转留言区等 -->
+    <div id="toolbar" class="m-padded m-fixed m-right-bottom" style="display: none;">
+        <div class="ui vertical icon buttons ">
+            <button type="button" class="ui toc teal button">目录</button>
+            <a href="#comment-list" class="ui teal button">留言</a>
+            <button type="button" class="ui wechat icon button"><i class="weixin icon"></i></button>
+            <a href="#" id="toTop-button" class="ui icon button"><i class="chevron up icon"></i></a>
+        </div>
+    </div>
+
+    <!-- 生成的目录 -->
+    <div class="ui toc-container flowing popup transition hidden" style="width: 250px;">
+        <ol class="js-toc"></ol>
+    </div>
+</div>
+
+<!-- 生成的文章二维码 -->
+<div id="qrcode" class="ui wechat-qr flowing popup transition hidden" style="width: 130px !important;">
+    <!-- <img src="images/wechat.png" alt="" class="ui rounded image" style="width: 120px;"> -->
+</div>
+
+<!-- 底部 -->
+<div id="footer"></div>
+
+<script src="lib/jquery/jquery-3.3.1.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+<script src="lib/highlight/highlight.pack.js"></script>
+<script src="lib/highlight/highlightjs-line-numbers.js"></script>
+<script src="lib/tocbot/tocbot.min.js"></script>
+<script src="lib/qrcode/qrcode.min.js"></script>
+<script src="lib/waypoints/jquery.waypoints.min.js"></script>
+<script src="js/front-include.js"></script>
+<script src="js/vuejs-2.5.16.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data: {
+            blog: {
+                user: {
+                    avatar: "",
+                    nickname: ""
+                },
+                type: {
+                    name: ""
+                },
+                nicks: [{
+                    name: ""
+                }]
+            },
+            comment: {
+                avatar: "https://picsum.photos/id/777/100/100",
+                nickname: "",
+                content: "",
+                blogId: -1,
+                parentCommentId: -1
+            },
+            msg: "",
+            commentList: [],
+            isChange: false,
+            commentCount: 0,
+            admin: {
+                nickname: ""
+            }
+        },
+        created() {
+            const href = window.location.href;
+            this.comment.blogId = parseInt(href.substring(href.lastIndexOf("=") + 1));
+            axios.put("/blogs/plusViews/" + this.comment.blogId).then(({data}) => {
+                this.blog = data;
+            }).catch();
+            axios.get("/comments/" + this.comment.blogId).then(({data}) => {
+                this.commentList = data;
+            }).catch();
+            axios.get("/comments/count/" + this.comment.blogId).then(({data}) => {
+                this.commentCount = data;
+            }).catch();
+            axios.get("/users").then(({data}) => {
+                this.admin = data;
+                this.comment.nickname = this.admin.nickname;
+            }).catch();
+        },
+        watch: {
+            isChange: {
+                handler() {
+                    axios.get("/comments/" + this.comment.blogId).then(({data}) => {
+                        this.commentList = data;
+                    }).catch(() => {
+                        this.commentList = [];
+                    });
+                    axios.get("/comments/count/" + this.comment.blogId).then(({data}) => {
+                        this.commentCount = data;
+                    }).catch(() => {
+                        this.commentCount = 0;
+                    });
+                }
+            },
+            nickname() {
+                let randomAvatarId = Math.floor((Math.random() * 1000 + 84));
+                axios.get("https://picsum.photos/id/" + randomAvatarId + "/100/100").then(() => {
+                    this.comment.avatar = "https://picsum.photos/id/" + randomAvatarId + "/100/100";
+                }).catch(() => {
+                    this.comment.avatar = "https://picsum.photos/id/777/100/100";
+                });
+            }
+        },
+        computed: {
+            nickname() {
+                return this.comment.nickname;
+            }
+        },
+        methods: {
+            checkNickname() {
+                //1.定义校验规则
+                const reg_nickname = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_nickname.test(this.comment.nickname);
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "请输入您的昵称！"
+                }
+                return flag;
+            },
+            checkContent() {
+                //1.定义校验规则
+                const reg_content = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_content.test($("#commentContent").val().trim());
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "请输入评论内容！"
+                }
+                return flag;
+            },
+            publishComment() {
+                if (this.checkContent() && this.checkNickname()) {
+                    this.comment.content = $("#commentContent").val().trim();
+                    this.comment.createTime = new Date();
+                    axios.post("/comments", this.comment).then(() => {
+                        this.isChange = !this.isChange;
+                        this.clear();
+                        // document.querySelector('#comment-list').focus();
+                    }).catch(() => {
+                        console.log("fail post...");
+                    });
+                }
+            },
+            reply(nickname, id) {
+                $("#commentContent").attr("placeholder", "@" + nickname + ": ");
+                this.comment.parentCommentId = id;
+                document.querySelector('#comment-form').focus();
+            },
+            delById(id) {
+                if (confirm("该评论下的所有回复都会被删除，您确定要删除此评论吗？")) {
+                    axios.delete("/admin/comments/" + id).then(() => {
+                        this.isChange = !this.isChange;
+                    }).catch();
+                }
+            },
+            clear() {
+                $("#commentContent").val('');
+                this.comment.parentCommentId = -1;
+                $("#commentContent").attr("placeholder", "请输入评论信息...");
+            }
+        }
+    })
+</script>
+
+<script>
+    // 顶部菜单样式切换
+    $('.menu.toggle').click(function () {
+        $('.m-item').toggleClass('m-mobile-hide');
+    });
+
+    // 点击赞赏展示支付二维码
+    $("#payButton").popup({
+        popup: $('.payQR.popup'),
+        on: 'click',
+        position: 'bottom center'
+    });
+
+    // 点击目录生成目录
+    $(".toc.button").popup({
+        popup: $('.toc-container.popup'),
+        on: 'click',
+        position: 'left center'
+    });
+
+    // 鼠标经过微信图标展示二维码
+    $(".wechat").popup({
+        popup: $('.wechat-qr'),
+        position: 'left center'
+    });
+    // 生成文章二维码
+    let qrcode = new QRCode("qrcode", {
+        text: window.location.href,
+        width: 110,
+        height: 110,
+        colorDark: '#000000',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+    });
+
+    // waypoint
+    let waypoint = new Waypoint({
+        element: $('#waypoint'),
+        handler: function (direction) {
+            if (direction === 'down') {
+                $('#toolbar').show(500);
+            } else {
+                $('#toolbar').hide(500);
+            }
+        }
+    });
+
+    $(function () {
+        // 在页面加载时执行代码高亮
+        hljs.initHighlighting();
+
+        // 在页面加载时执行行号显示
+        $('code.hljs').each(function (i, block) {
+            hljs.lineNumbersBlock(block);
+        });
+
+        // 初始化生成目录
+        tocbot.init({
+            tocSelector: '.js-toc',
+            contentSelector: '.js-toc-content',
+            headingSelector: 'h1, h2, h3'
+        });
+
+        // 滚动到文章顶部
+        $('#toTop-button').click(() => {
+            // $(window).scrollTop(0, 0);
+            $.scrollTo(0, 500);
+        });
+    });
+
+
+</script>
+
+
+</body>
+
+</html>

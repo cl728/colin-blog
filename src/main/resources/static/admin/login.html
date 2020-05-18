@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客管理登录</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="../css/me.css">
+</head>
+
+
+<body>
+
+<br>
+<br>
+<br>
+<!--登录表单-->
+<div id="app" class="m-container small m-padded-tb-massive" style="max-width: 25em !important;">
+    <div class="ui container">
+        <div class="ui middle aligned center aligned grid">
+            <div class="column">
+                <h2 class="ui teal image header">
+                    <!--<img src="assets/images/logo.png" class="image">-->
+                    <div class="content">
+                        管理员登录
+                    </div>
+                </h2>
+                <form class="ui large form">
+                    <div class="ui segment">
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="user icon"></i>
+                                <input type="text" name="username" v-model="user.username" placeholder="用户名">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui left icon input">
+                                <i class="lock icon"></i>
+                                <input type="password" name="password" v-model="user.password" placeholder="密码">
+                            </div>
+                        </div>
+                        <button type="button" class="ui fluid large teal button" @click="login($event)">登录</button>
+                    </div>
+
+                    <div class="ui negative mini message" :class="{hidden : msg.length === 0}">
+                        {{msg}}
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="../lib/jquery/jquery-3.3.1.js"></script>
+<script src="../lib/semantic-ui/semantic.min.js"></script>
+<script src="../js/vuejs-2.5.16.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script src="../js/md5.js"></script>
+
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            user: {
+                username: '',
+                password: ''
+            },
+            msg: ''
+        },
+        methods: {
+            login(event) {
+                if (this.checkUsername() && this.checkPassword()) {
+                    event.preventDefault();
+
+                    let formData = new FormData();
+                    formData.append('username', this.user.username);
+                    formData.append('password', hex_md5(this.user.password));
+                    let config = {
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        }
+                    };
+
+                    axios.post("/admin/login", formData, config).then(() => {
+                        location.href = "blog-manage.html";
+                    }).catch(() => {
+                        this.msg = "用户名或密码错误！";
+                    });
+                }
+            },
+            checkUsername() {
+                //1.定义校验规则
+                const reg_username = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_username.test(this.user.username);
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "用户名不能为空！"
+                }
+                return flag;
+            },
+            checkPassword() {
+                //1.定义校验规则
+                const reg_password = /\S/;
+                //2.判断输入框的内容是否符合规则
+                const flag = reg_password.test(this.user.password);
+                //3.提示信息
+                if (!flag) {
+                    this.msg = "密码不能为空！"
+                }
+                return flag;
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

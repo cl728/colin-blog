@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传图片</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="../lib/editormd/css/editormd.min.css">
+    <link rel="stylesheet" href="../css/me.css">
+</head>
+
+
+<body>
+<div id="app">
+    <!-- 引入导航 -->
+    <div id="header"></div>
+    <!--二级导航-->
+    <div class="ui attached pointing menu">
+        <div class="ui container">
+            <div class="right menu">
+                <a href="image-manage.html" class="item">图片管理</a>
+                <a href="image-upload.html" class="item grey active">新增图片</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 中间部分 -->
+    <div class="m-container-small m-padded-tb-big">
+        <div class="ui container">
+            <form class="ui form">
+                <!--图片描述-->
+                <div class="field">
+                    <div class="ui left labeled action input">
+                        <label class="ui compact teal basic label">图片描述</label>
+                        <input type="text" v-model="description">
+                    </div>
+                </div>
+
+                <!--图片上传-->
+                <div class="field">
+                    <div class="ui left labeled action input">
+                        <label class="ui teal basic label">选择图片</label>
+                        <input type="file" @change="getFile($event)"/><br/>
+                    </div>
+                </div>
+
+                <!-- 表单校验不通过的信息 -->
+                <div class="ui negative message">
+                    {{msg}}
+                </div>
+
+                <!-- 返回、保存、发布按钮 -->
+                <div class="ui right aligned container">
+                    <button type="button" class="ui button" onclick="window.history.go(-1)">返回</button>
+                    <button type="button" class="ui teal button" @click="upload($event)">上传</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <!-- 引入底部 -->
+    <div id="footer"></div>
+</div>
+
+
+<script src="../lib/jquery/jquery-3.3.1.js"></script>
+<script src="../lib/semantic-ui/semantic.min.js"></script>
+<script src="../lib/editormd/editormd.min.js"></script>
+<script src="../js/vuejs-2.5.16.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+<script src="../js/manage-include.js"></script>
+
+<script>
+    const vm = new Vue({
+        el: "#app",
+        data: {
+            description: "",
+            msg: ""
+        },
+        methods: {
+            getFile(event) {
+                this.file = event.target.files[0];
+                console.log(this.file);
+            },
+            upload(event) {
+                event.preventDefault();
+                let formData = new FormData();
+
+                formData.append('file', this.file);
+                formData.append('description', this.description);
+
+                let config = {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                };
+                axios.post("/admin/images/upload", formData, config).then(() => {
+                    location.href = "image-manage.html";
+                }).catch(() => {
+                    this.msg = "上传失败！";
+                });
+            }
+        }
+    })
+</script>
+
+</body>
+
+</html>

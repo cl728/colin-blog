@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>关于我</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="css/me.css">
+    <link rel="stylesheet" href="css/typo.css">
+</head>
+
+
+<body>
+<!-- 导航 -->
+<div id="header"></div>
+
+<!-- 中间部分 -->
+<div class="m-container m-padded-tb-big">
+    <div class="ui container">
+        <div class="ui stackable grid">
+            <!-- 左边图片、博客说明 -->
+            <div class="eleven wide column">
+                <!-- 图片部分 -->
+                <div class="ui attached segment">
+                    <img src="https://picsum.photos/id/1011/800/400" alt="" class="ui rounded image">
+                </div>
+                <!-- 博客说明 -->
+                <div class="ui attached segment m-text">
+                    <h3 id="一关于本站"><strong>一、前言</strong></h3>
+                    <p>自从今年3月初学习了 <strong>SpringBoot</strong> 和 <strong>Vue.js</strong>
+                        以来，我便很想自己动手做一套项目，以巩固所学。在一次偶然的搜寻中，我在b站发现了全栈大佬 <a
+                                href="https://space.bilibili.com/155831986" target="_blank">@S丶m1lence丶</a> 的一套 <a
+                                href="https://www.bilibili.com/video/BV1nE411r7TF?p=1" target="_blank">springBoot开发一个小而美的个人博客</a>详细教程，便参照教程，开发了此站。在该套教程中，up主带你从0到1搭建一个属于自己的个人博客，喜欢记得<strong>素质三连</strong>哦。
+                    </p>
+                    <p>本站的页面设计与开发基本同教程一致（前端弱鸡在线卑微），但<strong>后端开发与前台数据渲染部分几乎都由自己完成</strong>。后端接口遵循
+                        <strong>基本的 Restful</strong> 接口规范，通过 <strong>HTTP Status Code</strong> 描述请求产生的各种结果。而由于本人只是 Vue
+                        的初学者，对于<strong>组件化开发</strong>尚未掌握（前端弱鸡再次卑微），因此在本项目中，我给每个页面都实例化了一个Vue对象。这样就导致不能做到组件复用，代码也显得冗余了些。这个问题在我将在后续迭代版本中予以解决。
+                    </p>
+                    <h3 id="二所用技术栈"><strong>二、所用技术栈</strong></h3>
+                    <ul>
+                        <li>前端：
+                            <ul>
+                                <li>semantic-ui框架：页面布局</li>
+                                <li>JQuery：插件集成、动画效果</li>
+                                <li><strong>Vue</strong>：后台数据渲染</li>
+                                <li><strong>axios</strong>：前后端数据交互</li>
+                            </ul>
+                        </li>
+                        <li>后端：
+                            <ul>
+                                <li>SpringBoot 2.2.5.RELEASE</li>
+                                <li><strong>MyBatis</strong></li>
+                                <li><strong>通用 Mapper</strong>：简化开发</li>
+                                <li><strong>PageHelper</strong>：分页插件</li>
+                                <li><strong>FastDFS</strong>：文件系统，存储发布博客上传的图片</li>
+                            </ul>
+                        </li>
+                        <li>数据库：
+                            <ul>
+                                <li>MySQL</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <h3 id="三项目源码地址"><strong>三、项目源码地址</strong></h3>
+                    <p>本项目已开源至 <a href="https://github.com/cl728/colin-blog" target="_blank">GitHub</a>，欢迎 star！</p>
+                    <h3 id="四一些心得"><strong>四、一些心得</strong></h3>
+                    <p>
+                        从4月末到5月中旬，经历了二十来天，终于把这个项目的1.0.0敲定了。虽然项目结构很小，业务逻辑也不甚复杂，但麻雀虽小，五脏俱全，做这个项目将我之前所学的技术栈很好地串连了起来。对于一些相对来说比较难的地方，比如<strong>评论模块的展示</strong>、<strong>MyBatis
+                        多表关系的配置</strong>，以及 <strong>debug 的过程</strong>，都是比较考验我的耐心的。
+                        本人只是个小白，本站难免会有一些未修复或未发现的 <strong>bug</strong>，还望各位大佬不吝赐教。</p>
+                    <blockquote class="m-margin-tlb" style="bottom: auto">
+                        <p><strong>Colin</strong><br><strong>2020-05-17</strong></p>
+                    </blockquote>
+                </div>
+            </div>
+            <!-- 右边个人介绍 -->
+            <div class="five wide column">
+                <div class="ui segments">
+                    <!-- header -->
+                    <div class="ui top attached segment">
+                        <div class="header">
+                            <i class="user icon"></i> 关于我
+                        </div>
+                    </div>
+                    <!-- 自我描述 -->
+                    <div class="ui attached segment">
+                        <p class="m-text">Colin，一个不能上天摘星辰，但可下海底捞捞肥牛、蟹柳、豆腐串的95后秃头老男人。</p>
+                        <p class="m-text">沉迷于0和1的世界无法自拔，进可研发 CPU 芯片、带项目出方案，退可盘坐于电脑前、做全世界最好的网管。</p>
+                    </div>
+                    <!-- 兴趣爱好标签 -->
+                    <div class="ui attached segment">
+                        <div class="ui orange basic left pointing label">编程</div>
+                        <div class="ui orange basic left pointing label">音乐</div>
+                        <div class="ui orange basic left pointing label">电影</div>
+                        <div class="ui orange basic left pointing label">跑步</div>
+                    </div>
+                    <!-- 技术标签 -->
+                    <div class="ui attached segment">
+                        <a class="ui teal basic left pointing label m-margin-small">
+                            Java
+                        </a>
+                        <a class="ui teal basic left pointing label m-margin-small">
+                            JavaScript
+                        </a>
+                        <a class="ui teal basic left pointing label m-margin-small">
+                            Vue
+                        </a>
+                        <a class="ui teal basic left pointing label m-margin-small">
+                            MySQL
+                        </a>
+                        <a class="ui teal basic left pointing label m-margin-small">
+                            SpringBoot
+                        </a>
+                        <a class="ui teal basic left pointing label m-margin-small">
+                            SpringMVC
+                        </a>
+                    </div>
+                    <div class="ui buttom attached segment">
+                        <a href="https://github.com/cl728/colin-blog" target="_blank" class="ui circular icon button"><i
+                                class="github icon"></i></a>
+                        <a class="ui wechat circular icon button"><i class="weixin icon"></i></a>
+                        <a class="ui qq circular icon button"><i class="qq icon"></i></a>
+                    </div>
+
+                    <!-- 二维码 -->
+                    <div class="ui qq-qr flowing popup transition hidden">
+                        <img src="http://134.175.237.101/group1/M00/00/00/rBAADl7AjLCAKqeWAAU3Df-5_mI135.png" alt=""
+                             class="ui rounded image" style="width: 150px;">
+                    </div>
+                    <div class="ui wechat-qr flowing popup transition hidden">
+                        <img src="http://134.175.237.101/group1/M00/00/00/rBAADl7Ah6OAaHqyAAC4V_dRNqY370.png" alt=""
+                             class="ui rounded image" style="width: 150px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div id="footer"></div>
+
+<script src="lib/jquery/jquery-3.3.1.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
+<script src="js/front-include.js"></script>
+
+<script>
+    $('.menu.toggle').click(function () {
+        $('.m-item').toggleClass('m-mobile-hide');
+    });
+
+    $(".qq").popup({
+        popup: $('.qq-qr'),
+        position: 'bottom center'
+    });
+
+    $(".wechat").popup({
+        popup: $('.wechat-qr'),
+        position: 'bottom center'
+    });
+</script>
+</body>
+
+</html>

@@ -1,0 +1,14 @@
+server:
+  port: 8888
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: your database url
+    username: your database username
+    password: your database password
+logging:
+  level:
+    root: info
+    fun.donglin: debug
+  file:
+    name: your log's filename

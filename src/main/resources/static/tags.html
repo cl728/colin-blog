@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标签</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.css">
+    <link rel="stylesheet" href="css/me.css">
+</head>
+
+
+<body>
+<!-- 导航 -->
+<div id="header"></div>
+
+<!-- 中间部分 -->
+<div class="m-container-small m-padded-tb-big" id="app">
+    <div class="ui container">
+        <!-- header -->
+        <div class="ui top attached segment">
+            <div class="ui middle aligned two column grid">
+                <div class="column">
+                    <h3 class="ui teal header">标签</h3>
+                </div>
+                <div class="right aligned column">
+                    共 <h2 class="ui orange header m-inline-block m-text-thin"> {{tags.length}} </h2> 个
+                </div>
+            </div>
+        </div>
+        <!-- 标签 -->
+        <div class="ui attached segment m-padded-tb-large">
+            <div class="ui labeled button m-margin-tiny"
+                 v-for="(tag, index) in tags" :key="index">
+                <button class="ui toggle button" :class="{active : search.tagNames.includes(tag.name)}"
+                        @click="changeSearchTagName(tag.name)">{{tag.name}}
+                </button>
+                <div class="ui basic teal left pointing label">{{tag.blogList.length}}</div>
+            </div>
+        </div>
+
+        <!-- 标签所对应的博客列表 -->
+        <div class="ui top attached teal segment" v-if="blogList.length !== 0">
+            <div class="ui padded vertical segment m-padded-tb-large m-mobile-lr-clear"
+                 v-for="(blog, index) in blogList" :key="index">
+                <div class="ui mobile reversed stackable grid">
+                    <div class="eleven wide column">
+                        <!-- 标题 -->
+                        <h3 class="ui header">
+                                    <span class="ui mini basic left pointing label"
+                                          :class="[{orange : blog.flag === '转载'},
+                                    {teal : blog.flag === '原创'},{blue : blog.flag === '翻译'}]">
+                                        {{blog.flag}}
+                                    </span>
+                            <a :href="'detail.html?id=' + blog.id" style="color: black">{{blog.title}}</a>
+                        </h3>
+                        <!-- 摘要 -->
+                        <a class="m-text" :href="'detail.html?id=' + blog.id" style="color: #000;">
+                            {{blog.description.length > 100 ? blog.description.substr(0, 100) + "..." :
+                            blog.description + "\n"}}
+                        </a>
+                        <!-- 相关信息 -->
+                        <div class="ui stackable grid m-margin-top">
+                            <div class="eleven wide column">
+                                <div class="ui mini horizontal link list">
+                                    <div class="item">
+                                        <!-- 头像 -->
+                                        <img :src="blog.user.avatar" alt=""
+                                             class="ui avatar image">
+                                        <!-- 昵称 -->
+                                        <div class="content"><a href="#" class="header">{{blog.user.nickname}}</a></div>
+                                    </div>
+                                    <!-- 发布时间 -->
+                                    <div class="item">
+                                        <i class="calendar icon"></i> {{new Date(new
+                                        Date(blog.createTime).getTime()).toLocaleString()}}
+                                    </div>
+                                    <!-- 浏览次数 -->
+                                    <div class="item">
+                                        <i class="eye icon"></i> {{blog.views}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="right aligned five wide column">
+                                <div class="ui teal mini right pointing label"
+                                     :class="{basic : !search.tagNames.includes(tag.name)}"
+                                     v-for="(tag, index) in blog.tags" :key="index">
+                                    {{tag.name}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 首图 -->
+                    <div class="five wide column">
+                        <a href="#" target="_blank">
+                            <img :src="blog.firstPicture" alt="" class="ui rounded image">
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- footer -->
+        <div class="ui bottom attached segment" v-if="blogList.length !== 0">
+            <div class="ui middle aligned two column grid">
+                <div class="column">
+                    <div class="ui mini left floated pagination menu">
+                        <a class="icon item" :class="{disabled : search.page === 1}" @click="prev()">
+                            <i class="left chevron icon"></i>
+                        </a>
+                        <a class="item" v-for="currPage in Math.min(5, totalPage)"
+                           :class="{active : index(currPage) === search.page}"
+                           @click="search.page = index(currPage)">
+                            {{index(currPage)}}
+                        </a>
+                        <a class="icon item" :class="{disabled : search.page === totalPage}"
+                           @click="next()">
+                            <i class="right chevron icon"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="right aligned column">
+                    共 <h2 class="ui orange header m-inline-block m-text-thin"> {{totalPage}} </h2> 页
+                </div>
+            </div>
+        </div>
+
+        <!-- 加载器 -->
+        <div class="ui top attached teal segment" v-else>
+            <div class="ui active centered inline loader"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部 -->
+<div id="footer"></div>
+
+<script src="lib/jquery/jquery-3.3.1.js"></script>
+<script src="lib/semantic-ui/semantic.min.js"></script>
+<script src="js/front-include.js"></script>
+<script src="js/vuejs-2.5.16.js"></script>
+<script src="js/axios-0.18.0.js"></script>
+
+<script>
+    const vm = new Vue({
+        el: '#app',
+        data: {
+            tags: [],
+            search: {
+                page: 1,
+                tagNames: []
+            },
+            blogList: [],
+            total: 0,       // 博客总数
+            totalPage: 0    // 博客列表页数
+        },
+        created() {
+            const href = decodeURI(window.location.href);
+            if (href.indexOf("id") !== -1) {
+                let id = parseInt(href.substring(href.lastIndexOf("=") + 1));
+                axios.get("/tags/id/" + id).then(({data}) => {
+                    this.search.tagNames.push(data.name);
+                }).catch();
+            }
+            axios.get("/tags/withBlogs").then(({data}) => {
+                this.tags = data;
+            });
+            axios.post("/blogs/page/tagParams", this.search).then(({data}) => {
+                this.blogList = data.items;
+                this.total = data.total;
+                this.totalPage = data.totalPage;
+            });
+        },
+        watch: {
+            search: {
+                deep: true,
+                handler() {
+                    axios.post("/blogs/page/tagParams", this.search).then(({data}) => {
+                        this.blogList = data.items;
+                        this.total = data.total;
+                        this.totalPage = data.totalPage;
+                    }).catch(() => {
+                        this.blogList = [];
+                        this.total = 0;
+                        this.totalPage = 0;
+                    });
+                }
+            }
+        },
+        methods: {
+            changeSearchTagName(tagName) {
+                if (this.search.tagNames.includes(tagName)) {
+                    this.search.tagNames = this.search.tagNames.filter(temp => {
+                        return temp !== tagName;
+                    })
+                } else {
+                    this.search.tagNames.push(tagName);
+                }
+            },
+            prev() {
+                if (this.search.page > 1) {
+                    this.search.page -= 1;
+                }
+            },
+            next() {
+                if (this.search.page < this.totalPage) {
+                    this.search.page += 1;
+                }
+            },
+            index(i) {
+                if (this.totalPage <= 5 || this.search.page <= 3) { //前五页
+                    return i;
+                } else if (this.search.page > this.totalPage - 3) { //后五页
+                    return this.totalPage - 5 + i;
+                } else { //中间的页码
+                    return this.search.page - 3 + i;
+                }
+            }
+        }
+    })
+</script>
+
+<script>
+    $('.menu.toggle').click(function () {
+        $('.m-item').toggleClass('m-mobile-hide');
+    });
+</script>
+</body>
+
+</html>

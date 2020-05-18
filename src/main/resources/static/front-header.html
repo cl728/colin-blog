@@ -1,0 +1,62 @@
+<!-- 首部导航 -->
+<div id="front-header">
+    <nav class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+        <div class="ui container">
+            <div class="ui inverted secondary stackable menu">
+                <h2 class="ui teal header item">Blog</h2>
+                <a v-for="(link, index) in links" :key="index"
+                   :href="link.href" class="m-item item m-mobile-hide"
+                   :class="{active : actualHref === link.href}">
+                    <i class="mini icon" :class="[{home : link.name === '首页'},
+                    {idea : link.name === '分类'},{tags : link.name === '标签'},
+                    {clone : link.name === '归档'},{comment : link.name === '留言'},
+                    {alternate : link.name === '留言'},{info : link.name === '关于本站'}]"
+                    ></i>{{link.name}}</a>
+            </div>
+        </div>
+        <a href="#" class="ui menu toggle icon black button m-right-top m-mobile-show">
+            <i class="sidebar icon"></i>
+        </a>
+    </nav>
+</div>
+
+<script src="/lib/jquery/jquery-3.3.1.js"></script>
+<script src="/lib/semantic-ui/semantic.min.js"></script>
+<script src="/js/vuejs-2.5.16.js"></script>
+<script src="/js/axios-0.18.0.js"></script>
+
+<script>
+    const frontHeader = new Vue({
+        el: '#front-header',
+        data: {
+            links: [
+                {href: "index.html", name: "首页"},
+                {href: "types.html", name: "分类"},
+                {href: "tags.html", name: "标签"},
+                {href: "archives.html", name: "归档"},
+                {href: "message.html", name: "留言"},
+                {href: "about.html", name: "关于本站"}
+            ],
+            actualHref: ""
+        },
+        created() {
+            let href = decodeURI(window.location.href);
+            let tempHref = href.substr(href.lastIndexOf("/") + 1);
+            if (tempHref.indexOf("?") !== -1) {
+                this.actualHref = tempHref.split("?")[0];
+            } else {
+                this.actualHref = tempHref;
+            }
+        }
+    })
+</script>
+
+<script>
+    $('.menu.toggle').click(function () {
+        $('.m-item').toggleClass('m-mobile-hide');
+    });
+
+    $('.ui.dropdown').dropdown({
+        on: 'hover'
+    });
+</script>

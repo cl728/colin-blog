@@ -1,0 +1,87 @@
+<!-- 首部导航 -->
+<div id="manage-header">
+    <nav class="ui inverted attached segment m-padded-tb-mini m-shadow-small">
+        <div class="ui container">
+            <div class="ui inverted secondary stackable menu">
+                <h2 class="ui teal header item">Blog-Manage</h2>
+                <a v-for="(link, index) in links" :key="index"
+                   :href="link.href" class="m-item item m-mobile-hide"
+                   :class="{active : (actualHref === link.href || actualHref === link.secondaryHref)}">
+                    <i class="mini icon"
+                       :class="[{home : link.name === '博客'},{idea : link.name === '分类'},
+                        {tags : link.name === '标签'},{camera : link.name === '图片'},
+                        {comment : link.name === '消息'}, {alternate : link.name === '消息'}]"
+                    ></i>{{link.name}}
+                </a>
+                <div class="right m-item m-mobile-hide menu">
+                    <div class="ui dropdown item">
+                        <div class="text">
+                            <img :src="user.avatar" alt="" class="ui avatar image">
+                            {{user.nickname}}
+                        </div>
+                        <i class="dropdown icon"></i>
+                        <div class="menu">
+                            <a @click="logout()" class="item"><i class="hand point right outline icon"></i> 注销</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="ui menu toggle icon black button m-right-top m-mobile-show">
+            <i class="sidebar icon"></i>
+        </a>
+    </nav>
+</div>
+
+<script src="../lib/jquery/jquery-3.3.1.js"></script>
+<script src="../lib/semantic-ui/semantic.min.js"></script>
+<script src="../js/vuejs-2.5.16.js"></script>
+<script src="../js/axios-0.18.0.js"></script>
+
+<script>
+    new Vue({
+        el: '#manage-header',
+        data: {
+            user: {},
+            links: [
+                {href: "blog-manage.html", secondaryHref: "blog-publish.html", name: "博客"},
+                {href: "type-manage.html", secondaryHref: "type-publish.html", name: "分类"},
+                {href: "tag-manage.html", secondaryHref: "tag-publish.html", name: "标签"},
+                {href: "image-manage.html", secondaryHref: "image-upload.html", name: "图片"},
+                {href: "comment-manage.html", secondaryHref: "message-manage.html", name: "消息"}
+            ],
+            actualHref: ""
+        },
+        created() {
+            axios.get("/users").then(({data}) => {
+                this.user = data;
+            }).catch(() => {
+                this.user = {username: "unknown", avatar: "https://picsum.photos/id/1011/100/100"}
+            });
+            let href = decodeURI(window.location.href);
+            let tempHref = href.substr(href.lastIndexOf("/") + 1);
+            if (tempHref.indexOf("?") !== -1) {
+                this.actualHref = tempHref.split("?")[0];
+            } else {
+                this.actualHref = tempHref;
+            }
+        },
+        methods: {
+            logout() {
+                axios.get("/admin/logout").then(() => {
+                    location.href = "login.html";
+                }).catch();
+            }
+        }
+    })
+</script>
+
+<script>
+    $('.menu.toggle').click(function () {
+        $('.m-item').toggleClass('m-mobile-hide');
+    });
+
+    $('.ui.dropdown').dropdown({
+        on: 'hover'
+    });
+</script>
