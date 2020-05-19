@@ -212,3 +212,7 @@ body {
         width: 100% !important;
     }
 }
+
+.ui.modal{
+    top: 17.5%;
+}

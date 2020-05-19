@@ -41,6 +41,73 @@
 
         <!-- 标签所对应的博客列表 -->
         <div class="ui top attached teal segment" v-if="blogList.length !== 0">
+            <!-- 置顶博客列表 -->
+            <div class="ui padded vertical secondary segment m-padded-tb-large m-mobile-lr-clear"
+                 v-show="topBlogList.length !== 0"
+                 v-for="(topBlog, index) in topBlogList" :key="topBlog.id"
+                 @click="jumpToDetail(topBlog.id)">
+                <div class="ui mobile reversed stackable grid">
+                    <div class="eleven wide column">
+                        <h3 class="ui header">
+                            <span class="ui mini grey basic left pointing label">置顶</span>
+                            <span class="ui mini basic left pointing label"
+                                  :class="[{orange : topBlog.flag === '转载'},
+                                        {teal : topBlog.flag === '原创'},{blue : topBlog.flag === '翻译'}]"
+                                  v-text="topBlog.flag">
+                                           原创
+                                        </span>
+                            <a :href="'detail.html?id=' + topBlog.id" style="color: black"
+                               v-text="topBlog.title">Hello,
+                                Blog!</a>
+                        </h3>
+                        <a class="m-text" :href="'detail.html?id=' + topBlog.id" style="color: black;">
+                                        <span v-text="topBlog.description.length > 80 ? topBlog.description.substr(0, 80) + '...' :
+                                        topBlog.description">loading...</span>
+                        </a>
+                        <div class="ui stackable grid m-margin-top-large">
+                            <div class="eleven wide column">
+                                <div class="ui mini horizontal link list">
+                                    <div class="item">
+                                        <img :src="topBlog.user.avatar" alt=""
+                                             class="ui avatar image">
+                                        <div class="content"><a class="header"><span
+                                                v-text="topBlog.user.nickname">Colin</span></a>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <i class="calendar icon"></i>
+                                        <span v-text="topBlog.createTime">
+                                                        2020-05-14 02:24:10
+                                                    </span>
+                                    </div>
+                                    <div class="item">
+                                        <i class="eye icon"></i> <span v-text="topBlog.views">24</span>
+                                        &nbsp;&nbsp;
+                                        <span v-show="admin.nickname !== ''">
+                                                        <i class="heart icon"></i> <a
+                                                @click="toggleTop(topBlog.id)">取消置顶</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="right aligned five wide column">
+                                <div class="ui teal mini right pointing label"
+                                     :class="{basic : !search.tagNames.includes(tag.name)}"
+                                     v-for="(tag, index) in topBlog.tags" :key="index" v-text="tag.name">
+                                    Java
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="five wide column">
+                        <a target="_blank">
+                            <img :src="topBlog.firstPicture" alt=""
+                                 class="ui rounded image">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- 普通博客列表 -->
             <div class="ui padded vertical segment m-padded-tb-large m-mobile-lr-clear"
                  v-for="(blog, index) in blogList" :key="index">
                 <div class="ui mobile reversed stackable grid">
@@ -76,12 +143,17 @@
                                     </div>
                                     <!-- 发布时间 -->
                                     <div class="item">
-                                        <i class="calendar icon"></i> <span v-text="new Date(new
-                                        Date(blog.createTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</span>
+                                        <i class="calendar icon"></i> <span
+                                            v-text="blog.createTime">2020-05-14 02:24:10</span>
                                     </div>
                                     <!-- 浏览次数 -->
                                     <div class="item">
                                         <i class="eye icon"></i> <span v-text="blog.views">24</span>
+                                        &nbsp;&nbsp;
+                                        <span v-show="admin.nickname !== ''">
+                                                        <i class="heart outline icon"></i> <a
+                                                @click="toggleTop(blog.id)">置顶</a>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -153,7 +225,12 @@
                 page: 1,
                 tagNames: []
             },
+            isTop: false,
+            admin: {
+                nickname: ""
+            },
             blogList: [],
+            topBlogList: [],
             total: 0,       // 博客总数
             totalPage: 0    // 博客列表页数
         },
@@ -169,21 +246,47 @@
                 this.tags = data;
             });
             axios.post("/blogs/page/tagParams", this.search).then(({data}) => {
-                this.blogList = data.items;
+                this.blogList = data.items.filter(blog => !blog.top);
+                this.topBlogList = data.items.filter(blog => blog.top);
                 this.total = data.total;
                 this.totalPage = data.totalPage;
+            }).catch(() => {
+                this.blogList = [];
+                this.topBlogList = [];
+                this.total = 0;
+                this.totalPage = 0;
             });
+            axios.get("/users").then(({data}) => {
+                this.admin = data;
+            }).catch();
         },
         watch: {
             search: {
                 deep: true,
                 handler() {
                     axios.post("/blogs/page/tagParams", this.search).then(({data}) => {
-                        this.blogList = data.items;
+                        this.blogList = data.items.filter(blog => !blog.top);
+                        this.topBlogList = data.items.filter(blog => blog.top);
                         this.total = data.total;
                         this.totalPage = data.totalPage;
                     }).catch(() => {
                         this.blogList = [];
+                        this.topBlogList = [];
+                        this.total = 0;
+                        this.totalPage = 0;
+                    });
+                }
+            },
+            isTop: {
+                handler() {
+                    axios.post("/blogs/page/tagParams", this.search).then(({data}) => {
+                        this.blogList = data.items.filter(blog => !blog.top);
+                        this.topBlogList = data.items.filter(blog => blog.top);
+                        this.total = data.total;
+                        this.totalPage = data.totalPage;
+                    }).catch(() => {
+                        this.blogList = [];
+                        this.topBlogList = [];
                         this.total = 0;
                         this.totalPage = 0;
                     });
@@ -218,6 +321,11 @@
                 } else { //中间的页码
                     return this.search.page - 3 + i;
                 }
+            },
+            toggleTop(id) {
+                axios.put("/admin/blogs/" + id).then(() => {
+                    this.isTop = !this.isTop;
+                }).catch();
             }
         }
     })

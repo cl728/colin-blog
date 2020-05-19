@@ -71,9 +71,12 @@
                     <td v-text="b.title">Hello, Blog!</td>
                     <td v-text="b.type.name">Java</td>
                     <td v-text="b.published ? '是' : '否'">否</td>
-                    <td v-text="new Date(new Date(b.updateTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</td>
+                    <td v-text="b.updateTime">2020-05-14 2:24:10</td>
                     <td>
                         <a :href="'blog-publish.html?id=' + b.id" class="ui mini teal basic button">编辑</a>
+                        <button @click="toggleTop(b.id)" class="ui mini toggle basic button"
+                                :class="[{grey : b.top}, {orange : !b.top}]" v-text="b.top ? '取消置顶' : '置顶'">置顶
+                        </button>
                         <a @click="delById(b.id)" class="ui mini red basic button">删除</a>
                     </td>
                 </tr>
@@ -127,6 +130,7 @@
 <script src="../js/vuejs-2.5.16.js"></script>
 <script src="../js/axios-0.18.0.js"></script>
 <script src="../js/manage-include.js"></script>
+<script src="../js/date-format.js"></script>
 
 <script>
     const vm = new Vue({
@@ -146,6 +150,7 @@
                 isCommended: null
             },
             isEdit: false,
+            isTop: false,
             blogParams: {
                 blog: {},
                 typeName: {},
@@ -179,6 +184,26 @@
         watch: {
             search: {
                 deep: true,
+                handler() {
+                    axios.get("/blogs/page/blogParams", {
+                        params: {
+                            page: this.search.page,
+                            title: this.search.title,
+                            typeName: this.search.typeName,
+                            isCommended: this.search.isCommended
+                        }
+                    }).then(({data}) => {
+                        this.blogList = data.items;
+                        this.totalPage = data.totalPage;
+                        this.total = data.total;
+                    }).catch(() => {
+                        this.blogList = [];
+                        this.totalPage = 0;
+                        this.total = 0;
+                    });
+                }
+            },
+            isTop: {
                 handler() {
                     axios.get("/blogs/page/blogParams", {
                         params: {
@@ -268,13 +293,18 @@
                         tagNames.push($(this).text().trim());
                     });
                     this.blogParams.tagNames = tagNames;
-                    this.blogParams.blog.updateTime = new Date();
+                    this.blogParams.blog.updateTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
                     axios.put("/admin/blogs", this.blogParams).then(() => {
                         location.href = "blog-manage.html";
                     }).catch(() => {
                         this.msg = "操作失败！";
                     });
                 }
+            },
+            toggleTop(id) {
+                axios.put("/admin/blogs/" + id).then(() => {
+                    this.isTop = !this.isTop;
+                }).catch();
             }
         }
     })

@@ -3,12 +3,12 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: your database url
-    username: your database username
-    password: your database password
+    url: jdbc:mysql://134.175.237.101:3306/blog?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+    username: root
+    password: root
 logging:
   level:
     root: warn
     fun.donglin: info
   file:
-    name: your log's filename
+    name: blog/log/blog-pro.log

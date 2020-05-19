@@ -114,11 +114,6 @@ public class BlogServiceImpl implements BlogService {
         }
         Blog b = new Blog();
         BeanUtils.copyProperties( blog, b );
-        // BeanUtils.copyProperties() 对 Boolean 类型的值，要为setXXX(), getXXX() 才可进行 copy
-        b.setAppreciation( blog.isAppreciation() );
-        b.setCommended( blog.isCommended() );
-        b.setCommentAble( blog.isCommentAble() );
-        b.setShareStatement( blog.isShareStatement() );
         // markdown 转 html
         convert( b );
         return b;
@@ -187,6 +182,20 @@ public class BlogServiceImpl implements BlogService {
         Blog blog = blogParams.getBlog();
         assign( blog, blogParams.getTypeName(), blogParams.getTagNames() );
         return updateBlog( blog );
+    }
+
+    @Override
+    @Transactional
+    public boolean toggleTop(Long id) {
+        try {
+            Blog blog = this.blogMapper.findById( id );
+            Boolean isTop = !blog.getTop();
+            this.blogMapper.toggleTop( id, isTop );
+        } catch (Exception e) {
+            LOGGER.error( "切换置顶操作错误 : {}", e.getMessage() );
+            return false;
+        }
+        return true;
     }
 
     @Override

@@ -1,5 +1,8 @@
 package fun.donglin.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -58,12 +61,15 @@ public class Blog {
     @Column(name = "commended")
     private Boolean commended;      // 是否推荐
 
+    @Column(name = "top")
+    private Boolean top;            // 是否置顶
+
     @Column(name = "create_time")
-    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;        // 创建时间
 
     @Column(name = "update_time")
-    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTime;        // 更新时间
 
     private Type type;              // blog - type 多对一
@@ -130,44 +136,52 @@ public class Blog {
         this.views = views;
     }
 
-    public Boolean isAppreciation() {
-        return appreciation;
-    }
-
     public void setAppreciation(Boolean appreciation) {
         this.appreciation = appreciation;
-    }
-
-    public Boolean isShareStatement() {
-        return shareStatement;
     }
 
     public void setShareStatement(Boolean shareStatement) {
         this.shareStatement = shareStatement;
     }
 
-    public Boolean isCommentAble() {
-        return commentAble;
-    }
-
     public void setCommentAble(Boolean commentAble) {
         this.commentAble = commentAble;
-    }
-
-    public Boolean isPublished() {
-        return published;
     }
 
     public void setPublished(Boolean published) {
         this.published = published;
     }
 
-    public Boolean isCommended() {
+    public void setCommended(Boolean commended) {
+        this.commended = commended;
+    }
+
+    public Boolean getAppreciation() {
+        return appreciation;
+    }
+
+    public Boolean getShareStatement() {
+        return shareStatement;
+    }
+
+    public Boolean getCommentAble() {
+        return commentAble;
+    }
+
+    public Boolean getPublished() {
+        return published;
+    }
+
+    public Boolean getCommended() {
         return commended;
     }
 
-    public void setCommended(Boolean commended) {
-        this.commended = commended;
+    public Boolean getTop() {
+        return top;
+    }
+
+    public void setTop(Boolean top) {
+        this.top = top;
     }
 
     public Date getCreateTime() {
@@ -223,8 +237,8 @@ public class Blog {
         return "Blog{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
-                ", content='" + (content == null ? "" : content.substring( 0, 10 )) + '\'' +
-                ", description='" + (description == null ? "" : description.substring( 0, 10 )) + '\'' +
+                ", content='" + (content == null ? "" : content.substring( 0, 5 )) + '\'' +
+                ", description='" + (description == null ? "" : description.substring( 0, 5 )) + '\'' +
                 ", firstPicture='" + firstPicture + '\'' +
                 ", flag='" + flag + '\'' +
                 ", views=" + views +
@@ -233,6 +247,7 @@ public class Blog {
                 ", commentAble=" + commentAble +
                 ", published=" + published +
                 ", commended=" + commended +
+                ", top=" + top +
                 ", createTime=" + createTime +
                 ", updateTime=" + updateTime +
                 ", type=" + type +

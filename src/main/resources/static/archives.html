@@ -37,7 +37,7 @@
                     <span>
                         <i class="teal circle icon"></i> 《<span v-text="blog.title">Hello, Blog!</span>》
                         <div class="ui olive basic left pointing label m-padded-mini m-text-thin">
-                            <span v-text="new Date(new Date(blog.createTime).getTime()).toLocaleDateString().substr(5)">
+                            <span v-text="blog.createTime.substr(5, 5)">
                                 5/17
                             </span>
                         </div>

@@ -62,8 +62,73 @@
 
                     <!-- content -->
                     <div class="ui attached segment">
-                        <div class="ui padded vertical segment m-padded-tb-large"
-                             v-for="(blog, index) in blogList" :key="index" @click="jumpToDetail(blog.id)">
+                        <!-- 置顶博客列表 -->
+                        <div class="ui padded vertical secondary segment m-padded-tb-large m-mobile-lr-clear"
+                             :class="{grey : index !== 0}"
+                             v-show="topBlogList.length !== 0"
+                             v-for="(topBlog, index) in topBlogList" :key="topBlog.id">
+                            <div class="ui mobile reversed stackable grid">
+                                <div class="eleven wide column">
+                                    <h3 class="ui header">
+                                        <span class="ui mini grey basic left pointing label">置顶</span>
+                                        <span class="ui mini basic left pointing label"
+                                              :class="[{orange : topBlog.flag === '转载'},
+                                        {teal : topBlog.flag === '原创'},{blue : topBlog.flag === '翻译'}]"
+                                              v-text="topBlog.flag">
+                                           原创
+                                        </span>
+                                        <a :href="'detail.html?id=' + topBlog.id" style="color: black"
+                                           v-text="topBlog.title">Hello,
+                                            Blog!</a>
+                                    </h3>
+                                    <a class="m-text" :href="'detail.html?id=' + topBlog.id" style="color: black;">
+                                        <span v-text="topBlog.description.length > 80 ? topBlog.description.substr(0, 80) + '...' :
+                                        topBlog.description">loading...</span>
+                                    </a>
+                                    <div class="ui stackable grid m-margin-top">
+                                        <div class="eleven wide column">
+                                            <div class="ui mini horizontal link list">
+                                                <div class="item">
+                                                    <img :src="topBlog.user.avatar" alt=""
+                                                         class="ui avatar image">
+                                                    <div class="content"><a class="header"><span
+                                                            v-text="topBlog.user.nickname">Colin</span></a>
+                                                    </div>
+                                                </div>
+                                                <div class="item">
+                                                    <i class="calendar icon"></i>
+                                                    <span v-text="topBlog.createTime">
+                                                        2020-05-14 02:24:10
+                                                    </span>
+                                                </div>
+                                                <div class="item">
+                                                    <i class="eye icon"></i> <span v-text="topBlog.views">24</span>
+                                                    &nbsp;&nbsp;
+                                                    <span v-show="admin.nickname != ''">
+                                                    <i class="heart icon"></i> <a
+                                                            @click="toggleTop(topBlog.id)">取消置顶</a>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="right aligned five wide column">
+                                            <a target="_blank" :href="'types.html?typeName=' + topBlog.type.name"
+                                               class="ui teal basic label m-padded-tiny m-text-thin"><span
+                                                    v-text="topBlog.type.name">Java</span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="five wide column">
+                                    <a target="_blank">
+                                        <img :src="topBlog.firstPicture" alt=""
+                                             class="ui rounded image">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 普通博客列表 -->
+                        <div class="ui padded vertical segment m-padded-tb-large m-mobile-lr-clear"
+                             v-for="(blog, index) in blogList" :key="blog.id">
                             <div class="ui mobile reversed stackable grid">
                                 <div class="eleven wide column">
                                     <h3 class="ui header">
@@ -79,7 +144,7 @@
                                         <span v-text="blog.description.length > 80 ? blog.description.substr(0, 80) + '...' :
                                         blog.description">loading...</span>
                                     </a>
-                                    <div class="ui grid">
+                                    <div class="ui stackable grid m-margin-top">
                                         <div class="eleven wide column">
                                             <div class="ui mini horizontal link list">
                                                 <div class="item">
@@ -90,11 +155,17 @@
                                                     </div>
                                                 </div>
                                                 <div class="item">
-                                                    <i class="calendar icon"></i> <span v-text="new Date(new
-                                                    Date(blog.createTime).getTime()).toLocaleString()">2020/5/17 上午9:53:24</span>
+                                                    <i class="calendar icon"></i>
+                                                    <span v-text="blog.createTime">
+                                                        2020-05-14 02:24:10
+                                                    </span>
                                                 </div>
                                                 <div class="item">
-                                                    <i class="eye icon"></i> <span v-text="blog.views">24</span>
+                                                    <i class="eye icon"></i> <span v-text="blog.views">24</span> &nbsp;&nbsp;
+                                                    <span v-show="admin.nickname !== ''">
+                                                        <i class="heart outline icon"></i> <a
+                                                            @click="toggleTop(blog.id)">置顶</a>
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
@@ -223,14 +294,19 @@
         el: '#app',
         data: {
             blogList: [],
+            topBlogList: [],
             totalPage: 1,
             total: 0,
             types: [],
             tags: [],
+            isTop: false,
             latestBlogList: [],
             blogParams: {
                 page: 1,
                 title: ""
+            },
+            admin: {
+                nickname: ""
             }
         },
         created() {
@@ -241,13 +317,15 @@
                     published: true
                 }
             }).then(({data}) => {
-                this.blogList = data.items;
-                this.totalPage = data.totalPage;
+                this.blogList = data.items.filter(blog => !blog.top);
+                this.topBlogList = data.items.filter(blog => blog.top);
                 this.total = data.total;
+                this.totalPage = data.totalPage;
             }).catch(() => {
                 this.blogList = [];
-                this.totalPage = 0;
+                this.topBlogList = [];
                 this.total = 0;
+                this.totalPage = 0;
             });
             // 获取前六个分类
             axios.get("types/firstSix").then(({data}) => {
@@ -264,6 +342,10 @@
                 }
             }).then(({data}) => {
                 this.latestBlogList = data;
+            }).catch();
+            // 获取管理员对象
+            axios.get("/users").then(({data}) => {
+                this.admin = data;
             }).catch();
         },
         methods: {
@@ -286,8 +368,10 @@
                     return this.blogParams.page - 3 + i;
                 }
             },
-            jumpToDetail(id) {
-                location.href = "detail.html?id=" + id;
+            toggleTop(id) {
+                axios.put("/admin/blogs/" + id).then(() => {
+                    this.isTop = !this.isTop;
+                }).catch();
             }
         },
         watch: {
@@ -301,13 +385,36 @@
                             published: true
                         }
                     }).then(({data}) => {
-                        this.blogList = data.items;
-                        this.totalPage = data.totalPage;
+                        this.blogList = data.items.filter(blog => !blog.top);
+                        this.topBlogList = data.items.filter(blog => blog.top);
                         this.total = data.total;
+                        this.totalPage = data.totalPage;
                     }).catch(() => {
                         this.blogList = [];
-                        this.totalPage = 0;
+                        this.topBlogList = [];
                         this.total = 0;
+                        this.totalPage = 0;
+                    });
+                }
+            },
+            isTop: {
+                handler() {
+                    axios.get("blogs/page/blogParams", {
+                        params: {
+                            page: this.blogParams.page,
+                            title: this.blogParams.title,
+                            published: true
+                        }
+                    }).then(({data}) => {
+                        this.blogList = data.items.filter(blog => !blog.top);
+                        this.topBlogList = data.items.filter(blog => blog.top);
+                        this.total = data.total;
+                        this.totalPage = data.totalPage;
+                    }).catch(() => {
+                        this.blogList = [];
+                        this.topBlogList = [];
+                        this.total = 0;
+                        this.totalPage = 0;
                     });
                 }
             }

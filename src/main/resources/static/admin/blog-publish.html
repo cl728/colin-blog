@@ -236,11 +236,12 @@
 </div>
 
 <script src="../lib/jquery/jquery-3.3.1.js"></script>
-<script src="../lib/semantic-ui/semantic.min.js"></script>
+<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.10/semantic.min.js"></script>
 <script src="../lib/editormd/editormd.min.js"></script>
 <script src="../js/vuejs-2.5.16.js"></script>
 <script src="../js/axios-0.18.0.js"></script>
 <script src="../js/manage-include.js"></script>
+<script src="../js/date-format.js"></script>
 
 <script>
     const vm = new Vue({
@@ -258,7 +259,8 @@
                     published: false,
                     commended: false,
                     createTime: null,
-                    updateTime: null
+                    updateTime: null,
+                    views: 0
                 },
                 typeName: "",
                 tagNames: []
@@ -402,8 +404,8 @@
                     tagNames.push($(this).text().trim());
                 });
                 this.blogParams.tagNames = tagNames;
-                this.blogParams.blog.updateTime = new Date();
-                this.blogParams.blog.views = 0;
+                this.blogParams.blog.updateTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
+                this.blogParams.blog.views = this.blog == null ? 0 : this.blog.views;
                 this.blogParams.blog.user = this.user;
                 this.blogParams.blog.published = this.blog == null ? false : this.blog.published;
                 this.blogParams.blog.id = this.blogId;
@@ -422,7 +424,7 @@
                 if (this.checkTitle() && this.checkContent() && this.checkDescription() && this.checkTypeName() && this.checkTagName() && this.checkFirstPicture()) {
                     if (confirm("博客内容一经发布不可修改，确认要发布此博客吗？")) {
                         this.assign();
-                        this.blogParams.blog.createTime = new Date();
+                        this.blogParams.blog.createTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
                         this.blogParams.blog.published = true;
                         axios.post("/admin/blogs", this.blogParams).then(() => {
                             location.href = "blog-manage.html";

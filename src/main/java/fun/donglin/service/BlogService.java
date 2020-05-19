@@ -28,4 +28,6 @@ public interface BlogService {
     List<Blog> findByDate(String date);
 
     Blog plusViews(Long id);
+
+    boolean toggleTop(Long id);
 }

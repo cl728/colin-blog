@@ -1,6 +1,10 @@
 package fun.donglin.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import javax.persistence.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,7 +31,7 @@ public class Message {
     private String avatar;      // 头像
 
     @Column(name = "create_time")
-    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;    // 创建时间
 
     @Column(name = "admin_message")

@@ -1,7 +1,7 @@
 package fun.donglin.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -43,11 +43,11 @@ public class User {
     private Integer type;       // 管理员类型，1为管理员，2为普通管理员
 
     @Column(name = "create_time")
-    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;    // 创建时间
 
     @Column(name = "update_time")
-    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date updateTIme;    // 更新时间
 
     private List<Blog> blogList = new ArrayList<>();    // user - blog 一对多

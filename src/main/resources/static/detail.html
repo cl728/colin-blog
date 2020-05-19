@@ -31,8 +31,8 @@
                     </div>
                     <div class="item">
                         <i class="calendar icon"></i>
-                        <span v-text="new Date(new Date(blog.createTime).getTime()).toLocaleString()">
-                            2020/5/13 下午8:57:09
+                        <span v-text="blog.createTime">
+                            2020-05-14 02:24:10
                         </span>
                     </div>
                     <div class="item">
@@ -99,7 +99,7 @@
                     <div class="twelve wide column">
                         <ul class="list">
                             <li>作者：<span v-text="blog.user.nickname">Colin</span></li>
-                            <li>发表时间：<span v-text="new Date(new Date(blog.createTime).getTime()).toLocaleString()">2020/5/13 下午8:57:09</span>
+                            <li>发表时间：<span v-text="blog.createTime">2020-05-14 02:24:10</span>
                             </li>
                             <li>版权声明：著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</li>
                         </ul>
@@ -132,17 +132,21 @@
                                 </a>
                                 <div class="metadata">
                                     <span class="date"
-                                          v-text="new Date(new Date(comment.createTime).getTime()).toLocaleString()">
-                                        2020/5/13 上午9:50:06
+                                          v-text="comment.createTime">
+                                        2020-05-14 02:24:10
                                     </span>
                                 </div>
                                 <div class="text">
                                     <span v-text="comment.content">loading...</span>
                                 </div>
                                 <div class="actions">
-                                    <a class="reply" @click="reply(comment.nickname, comment.id)">回复</a>
+                                    <a class="reply" @click="reply(comment.nickname, comment.id)">
+                                        <i class="reply icon"></i>回复
+                                    </a>
                                     <a class="reply" style="color: teal" v-show="admin.nickname !== ''"
-                                       @click="delById(comment.id)">删除</a>
+                                       @click="delById(comment.id)">
+                                        <i class="trash alternate outline icon"></i>删除
+                                    </a>
                                 </div>
                             </div>
                             <div class="comments" v-show="comment.replyComments.length > 0">
@@ -163,8 +167,8 @@
                                         </a>
                                         <div class="metadata">
                                             <span class="date"
-                                                  v-text="new Date(new Date(replyComment.createTime).getTime()).toLocaleString()">
-                                                2020/5/13 上午9:50:06
+                                                  v-text="replyComment.createTime">
+                                                2020-05-14 02:24:10
                                             </span>
                                         </div>
                                         <div class="text">
@@ -172,9 +176,13 @@
                                         </div>
                                         <div class="actions">
                                             <a class="reply" style="color: teal"
-                                               @click="reply(replyComment.nickname, replyComment.id)">回复</a>
+                                               @click="reply(replyComment.nickname, replyComment.id)">
+                                                <i class="reply icon"></i>回复
+                                            </a>
                                             <a class="reply" style="color: teal" v-show="admin.nickname !== ''"
-                                               @click="delById(replyComment.id)">删除</a>
+                                               @click="delById(replyComment.id)">
+                                                <i class="trash alternate outline icon"></i>删除
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -241,6 +249,7 @@
 <script src="js/front-include.js"></script>
 <script src="js/vuejs-2.5.16.js"></script>
 <script src="js/axios-0.18.0.js"></script>
+<script src="js/date-format.js"></script>
 
 <script>
     const vm = new Vue({
@@ -345,7 +354,7 @@
             publishComment() {
                 if (this.checkContent() && this.checkNickname()) {
                     this.comment.content = $("#commentContent").val().trim();
-                    this.comment.createTime = new Date();
+                    this.comment.createTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
                     axios.post("/comments", this.comment).then(() => {
                         this.isChange = !this.isChange;
                         this.clear();

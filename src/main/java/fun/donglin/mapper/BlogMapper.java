@@ -66,6 +66,9 @@ public interface BlogMapper extends Mapper<Blog> {
     @Update("update t_blog set user_id = #{userId} where id = #{blogId}")
     void updateUserId(Long blogId, Long userId);
 
-    @Update( "update t_blog set views = views + 1 where id = #{id}" )
+    @Update("update t_blog set views = views + 1 where id = #{id}")
     void updateViewsById(Long id);
+
+    @Update("update t_blog set top = #{isTop} where id = #{id}")
+    void toggleTop(@Param("id") Long id, @Param("isTop") Boolean isTop);
 }

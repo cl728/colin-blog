@@ -195,6 +195,21 @@ public class BlogController {
     }
 
     /**
+     * 根据博客id切换置顶标志
+     *
+     * @param id 博客id
+     * @return 更新后的博客对象
+     */
+    @PutMapping("admin/blogs/{id}")
+    public ResponseEntity<Blog> toggleTop(@PathVariable Long id) {
+        boolean flag = this.blogService.toggleTop( id );
+        if (!flag) {
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).build();
+        }
+        return ResponseEntity.status( HttpStatus.NO_CONTENT ).build();
+    }
+
+    /**
      * 根据博客id删除博客对象
      *
      * @param id 博客id
@@ -205,17 +220,4 @@ public class BlogController {
         this.blogService.delById( id );
         return ResponseEntity.noContent().build();
     }
-
-    @GetMapping("blogs/test")
-    public ResponseEntity<Integer> divide(int sub) {
-        System.out.println( "divide!" );
-        Integer i;
-        try {
-            i = 1000 / sub;
-        } catch (Exception e) {
-            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).build();
-        }
-        return ResponseEntity.ok( i );
-    }
-
 }

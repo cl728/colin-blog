@@ -41,15 +41,19 @@
                                 </a>
                                 <div class="metadata">
                                     <span class="date"
-                                          v-text="new Date(new Date(message.createTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</span>
+                                          v-text="message.createTime">2020-05-14 02:24:10</span>
                                 </div>
                                 <div class="text" v-text="message.content">
                                     loading...
                                 </div>
                                 <div class="actions">
-                                    <a class="reply" @click="reply(message.nickname, message.id)">回复</a>
+                                    <a class="reply" @click="reply(message.nickname, message.id)">
+                                        <i class="reply icon"></i>回复
+                                    </a>
                                     <a class="reply" v-show="admin.nickname != ''" style="color: teal"
-                                       @click="delById(message.id)">删除</a>
+                                       @click="delById(message.id)">
+                                        <i class="trash alternate outline icon"></i>删除
+                                    </a>
                                 </div>
                             </div>
                             <div class="comments" v-show="message.replyMessages.length > 0">
@@ -70,16 +74,20 @@
                                         </a>
                                         <div class="metadata">
                                             <span class="date"
-                                                  v-text="new Date(new Date(replyMessage.createTime).getTime()).toLocaleString()">2020/5/14 下午2:24:10</span>
+                                                  v-text="replyMessage.createTime">2020-05-14 02:24:10</span>
                                         </div>
                                         <div class="text" v-text="replyMessage.content">
                                             loading...
                                         </div>
                                         <div class="actions">
                                             <a class="reply"
-                                               @click="reply(replyMessage.nickname, replyMessage.id)">回复</a>
+                                               @click="reply(replyMessage.nickname, replyMessage.id)">
+                                                <i class="reply icon"></i>回复
+                                            </a>
                                             <a class="reply" v-show="admin.nickname != ''" style="color: teal"
-                                               @click="delById(replyMessage.id)">删除</a>
+                                               @click="delById(replyMessage.id)">
+                                                <i class="trash alternate outline icon"></i>删除
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -127,6 +135,7 @@
 <script src="js/front-include.js"></script>
 <script src="js/vuejs-2.5.16.js"></script>
 <script src="js/axios-0.18.0.js"></script>
+<script src="js/date-format.js"></script>
 
 <script>
     const vm = new Vue({
@@ -213,12 +222,12 @@
             publishMessage() {
                 if (this.checkContent() && this.checkNickname()) {
                     this.message.content = $("#messageContent").val().trim();
-                    this.message.createTime = new Date();
+                    this.message.createTime = new Date().Format("yyyy-MM-dd hh:mm:ss");
                     axios.post("/messages", this.message).then(() => {
                         this.isChange = !this.isChange;
                         this.clear();
                     }).catch(() => {
-                        console.log("fail post...");
+                        this.msg = "发布失败！请稍候再试一次...";
                     });
                 }
             },
@@ -231,7 +240,9 @@
                 if (confirm("该留言下的所有回复都会被删除，您确定要删除此留言吗？")) {
                     axios.delete("/admin/messages/" + id).then(() => {
                         this.isChange = !this.isChange;
-                    }).catch();
+                    }).catch(() => {
+                        this.msg = "删除失败！";
+                    });
                 }
             },
             clear() {
