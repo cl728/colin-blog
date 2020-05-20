@@ -4,8 +4,8 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql:///blog?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
-    username: root
-    password: root
+    username: your local database username
+    password: your local database password
 logging:
   level:
     root: info

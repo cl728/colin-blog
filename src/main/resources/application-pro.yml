@@ -3,9 +3,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://134.175.237.101:3306/blog?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
-    username: root
-    password: root
+    url: jdbc:mysql://your-remote-server-ip-or-domain-name:your-remote-database-port/blog?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
+    username: your remote database username
+    password: your remote database password
 logging:
   level:
     root: warn

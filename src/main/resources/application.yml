@@ -8,7 +8,7 @@ spring:
     multipart:
       max-file-size: 5MB # 限制文件上传的大小
 mybatis:
-  type-aliases-package: fun.donglin.entity
+  type-aliases-package: your entity package location
 fdfs:
   so-timeout: 1501 # 超时时间
   connect-timeout: 601 # 连接超时时间
@@ -16,4 +16,4 @@ fdfs:
     width: 100
     height: 100
   tracker-list: # tracker地址：你的虚拟机服务器地址+端口（默认是22122）
-    - 134.175.237.101:22122
+    - your remote server ip:22122
