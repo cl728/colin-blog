@@ -40,7 +40,12 @@
                                 <input type="password" name="password" v-model="user.password" placeholder="密码">
                             </div>
                         </div>
-                        <button type="button" class="ui fluid large teal button" @click="login($event)">登录</button>
+                        <button type="button" class="ui fluid large teal button" @click="login($event)" v-if="!isLogin">
+                            登录
+                        </button>
+                        <div type="button" class="ui fluid large teal button" v-else>
+                            登录中...
+                        </div>
                     </div>
 
                     <div class="ui negative mini message" :class="{hidden : msg.length === 0}" v-text="msg"></div>
@@ -67,12 +72,14 @@
                 username: '',
                 password: ''
             },
-            msg: ''
+            msg: '',
+            isLogin: false
         },
         methods: {
             login(event) {
                 if (this.checkUsername() && this.checkPassword()) {
                     event.preventDefault();
+                    this.isLogin = true;
 
                     let formData = new FormData();
                     formData.append('username', this.user.username);
@@ -86,6 +93,7 @@
                     axios.post("/admin/login", formData, config).then(() => {
                         location.href = "blog-manage.html";
                     }).catch(() => {
+                        this.isLogin = false;
                         this.msg = "用户名或密码错误！";
                     });
                 }

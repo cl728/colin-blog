@@ -55,19 +55,6 @@ public class TypeServiceImpl implements TypeService {
     }
 
     @Override
-    public List<Type> findFirstSix() {
-        List<Type> tempTypes = this.typeMapper.findAll( null );
-        if (CollectionUtils.isEmpty( tempTypes ) || tempTypes.size() <= 6) {
-            return tempTypes;
-        }
-        List<Type> types = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            types.add( tempTypes.get( i ) );
-        }
-        return types;
-    }
-
-    @Override
     @Transactional
     public boolean saveOne(Type type) {
         Type record = new Type();

@@ -40,7 +40,7 @@
         </div>
 
         <!-- 标签所对应的博客列表 -->
-        <div class="ui top attached teal segment" v-if="blogList.length !== 0">
+        <div class="ui top attached teal segment" v-if="blogList.length !== 0 || topBlogList.length != 0">
             <!-- 置顶博客列表 -->
             <div class="ui padded vertical secondary segment m-padded-tb-large m-mobile-lr-clear"
                  v-show="topBlogList.length !== 0"
@@ -50,6 +50,8 @@
                     <div class="eleven wide column">
                         <h3 class="ui header">
                             <span class="ui mini grey basic left pointing label">置顶</span>
+                            <span class="ui mini red basic left pointing label"
+                                  v-show="topBlog.views >= 100">热门</span>
                             <span class="ui mini basic left pointing label"
                                   :class="[{orange : topBlog.flag === '转载'},
                                         {teal : topBlog.flag === '原创'},{blue : topBlog.flag === '翻译'}]"
@@ -83,7 +85,7 @@
                                     <div class="item">
                                         <i class="eye icon"></i> <span v-text="topBlog.views">24</span>
                                         &nbsp;&nbsp;
-                                        <span v-show="admin.nickname !== ''">
+                                        <span v-show="isAdmin">
                                                         <i class="heart icon"></i> <a
                                                 @click="toggleTop(topBlog.id)">取消置顶</a>
                                         </span>
@@ -114,11 +116,13 @@
                     <div class="eleven wide column">
                         <!-- 标题 -->
                         <h3 class="ui header">
-                                    <span class="ui mini basic left pointing label"
-                                          :class="[{orange : blog.flag === '转载'},
+                            <span class="ui mini red basic left pointing label"
+                                  v-show="blog.views >= 100">热门</span>
+                            <span class="ui mini basic left pointing label"
+                                  :class="[{orange : blog.flag === '转载'},
                                     {teal : blog.flag === '原创'},{blue : blog.flag === '翻译'}]" v-text="blog.flag">
-                                        原创
-                                    </span>
+                                    原创
+                            </span>
                             <a :href="'detail.html?id=' + blog.id" style="color: black" v-text="blog.title">Hello,
                                 Blog!</a>
                         </h3>
@@ -150,7 +154,7 @@
                                     <div class="item">
                                         <i class="eye icon"></i> <span v-text="blog.views">24</span>
                                         &nbsp;&nbsp;
-                                        <span v-show="admin.nickname !== ''">
+                                        <span v-show="isAdmin">
                                                         <i class="heart outline icon"></i> <a
                                                 @click="toggleTop(blog.id)">置顶</a>
                                         </span>
@@ -176,7 +180,7 @@
             </div>
         </div>
         <!-- footer -->
-        <div class="ui bottom attached segment" v-if="blogList.length !== 0">
+        <div class="ui bottom attached segment" v-if="blogList.length !== 0 || topBlogList.length != 0">
             <div class="ui middle aligned two column grid">
                 <div class="column">
                     <div class="ui mini left floated pagination menu">
@@ -201,8 +205,10 @@
         </div>
 
         <!-- 加载器 -->
-        <div class="ui top attached teal segment" v-else>
-            <div class="ui active centered inline loader"></div>
+        <div class="ui top attached teal segment m-padded-tb-big" v-else>
+            <div class="ui active centered inverted dimmer">
+                <div class="ui text loader">加载中</div>
+            </div>
         </div>
     </div>
 </div>
@@ -226,9 +232,7 @@
                 tagNames: []
             },
             isTop: false,
-            admin: {
-                nickname: ""
-            },
+            isAdmin: false,
             blogList: [],
             topBlogList: [],
             total: 0,       // 博客总数
@@ -243,7 +247,8 @@
                 }).catch();
             }
             axios.get("/tags/withBlogs").then(({data}) => {
-                this.tags = data;
+                this.tags = data.sort((tag1, tag2) => tag2.blogList.length - tag1.blogList.length);
+                ;
             });
             axios.post("/blogs/page/tagParams", this.search).then(({data}) => {
                 this.blogList = data.items.filter(blog => !blog.top);
@@ -256,9 +261,11 @@
                 this.total = 0;
                 this.totalPage = 0;
             });
-            axios.get("/users").then(({data}) => {
-                this.admin = data;
-            }).catch();
+            axios.get("/users").then(() => {
+                this.isAdmin = true;
+            }).catch(() => {
+                this.isAdmin = false;
+            });
         },
         watch: {
             search: {

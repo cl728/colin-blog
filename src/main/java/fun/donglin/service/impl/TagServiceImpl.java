@@ -43,19 +43,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<Tag> findFirstTen() {
-        List<Tag> tempTags = this.tagMapper.findAll();
-        if (CollectionUtils.isEmpty( tempTags ) || tempTags.size() <= 10) {
-            return tempTags;
-        }
-        List<Tag> tags = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            tags.add( tempTags.get( i ) );
-        }
-        return tags;
-    }
-
-    @Override
     @Transactional
     public boolean saveOne(Tag tag) {
         Tag record = new Tag();

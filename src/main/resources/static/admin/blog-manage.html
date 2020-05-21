@@ -75,7 +75,7 @@
                     <td>
                         <a :href="'blog-publish.html?id=' + b.id" class="ui mini teal basic button">编辑</a>
                         <button @click="toggleTop(b.id)" class="ui mini toggle basic button"
-                                :class="[{grey : b.top}, {orange : !b.top}]" v-text="b.top ? '取消置顶' : '置顶'">置顶
+                                :class="[{grey : b.top}, {orange : !b.top}, {disabled: !b.published}]" v-text="b.top ? '取消置顶' : '置顶'">置顶
                         </button>
                         <a @click="delById(b.id)" class="ui mini red basic button">删除</a>
                     </td>

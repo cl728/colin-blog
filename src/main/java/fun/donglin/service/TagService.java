@@ -21,7 +21,5 @@ public interface TagService {
 
     Tag findByName(String name);
 
-    List<Tag> findFirstTen();
-
     List<Tag> findAllWithBlogList();
 }

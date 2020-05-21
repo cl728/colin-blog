@@ -61,7 +61,7 @@
                     </div>
 
                     <!-- content -->
-                    <div class="ui attached segment">
+                    <div class="ui attached segment" v-if="blogList.length !== 0 || topBlogList.length != 0">
                         <!-- 置顶博客列表 -->
                         <div class="ui padded vertical secondary segment m-padded-tb-large m-mobile-lr-clear"
                              :class="{grey : index !== 0}"
@@ -71,6 +71,8 @@
                                 <div class="eleven wide column">
                                     <h3 class="ui header">
                                         <span class="ui mini grey basic left pointing label">置顶</span>
+                                        <span class="ui mini red basic left pointing label"
+                                              v-show="topBlog.views >= 100">热门</span>
                                         <span class="ui mini basic left pointing label"
                                               :class="[{orange : topBlog.flag === '转载'},
                                         {teal : topBlog.flag === '原创'},{blue : topBlog.flag === '翻译'}]"
@@ -104,7 +106,7 @@
                                                 <div class="item">
                                                     <i class="eye icon"></i> <span v-text="topBlog.views">24</span>
                                                     &nbsp;&nbsp;
-                                                    <span v-show="admin.nickname != ''">
+                                                    <span v-show="isAdmin">
                                                     <i class="heart icon"></i> <a
                                                             @click="toggleTop(topBlog.id)">取消置顶</a>
                                                     </span>
@@ -132,6 +134,8 @@
                             <div class="ui mobile reversed stackable grid">
                                 <div class="eleven wide column">
                                     <h3 class="ui header">
+                                        <span class="ui mini red basic left pointing label"
+                                              v-show="blog.views >= 100">热门</span>
                                         <span class="ui mini basic left pointing label"
                                               :class="[{orange : blog.flag === '转载'},
                                         {teal : blog.flag === '原创'},{blue : blog.flag === '翻译'}]">
@@ -162,7 +166,7 @@
                                                 </div>
                                                 <div class="item">
                                                     <i class="eye icon"></i> <span v-text="blog.views">24</span> &nbsp;&nbsp;
-                                                    <span v-show="admin.nickname !== ''">
+                                                    <span v-show="isAdmin">
                                                         <i class="heart outline icon"></i> <a
                                                             @click="toggleTop(blog.id)">置顶</a>
                                                     </span>
@@ -187,7 +191,7 @@
                     </div>
 
                     <!-- footer -->
-                    <div class="ui bottom attached segment">
+                    <div class="ui bottom attached segment" v-if="blogList.length !== 0 || topBlogList.length != 0">
                         <div class="ui middle aligned two column grid">
                             <div class="column">
                                 <div class="ui mini left floated pagination menu">
@@ -211,6 +215,12 @@
                         </div>
                     </div>
 
+                    <!-- 加载器 -->
+                    <div class="ui top attached teal segment m-padded-tb-big" v-else>
+                        <div class="ui active centered inverted dimmer">
+                            <div class="ui text loader">加载中</div>
+                        </div>
+                    </div>
                 </div>
                 <!-- 右边top -->
                 <div class="five wide column">
@@ -305,9 +315,7 @@
                 page: 1,
                 title: ""
             },
-            admin: {
-                nickname: ""
-            }
+            isAdmin: false
         },
         created() {
             // 获取博客列表
@@ -327,13 +335,17 @@
                 this.total = 0;
                 this.totalPage = 0;
             });
-            // 获取前六个分类
-            axios.get("types/firstSix").then(({data}) => {
-                this.types = data;
+            // 获取topSix
+            axios.get("types/withBlogs").then(({data}) => {
+                // 按分类下对应的博客篇数降序排序
+                let sortedTypes = data.sort((type1, type2) => type2.blogList.length - type1.blogList.length);
+                this.types = sortedTypes.slice(0, 6);
             }).catch();
-            // 获取前十个标签
-            axios.get("tags/firstTen").then(({data}) => {
-                this.tags = data;
+            // 获取topTen
+            axios.get("tags/withBlogs").then(({data}) => {
+                // 按标签下对应的博客篇数降序排序
+                let sortedTags = data.sort((tag1, tag2) => tag2.blogList.length - tag1.blogList.length);
+                this.tags = sortedTags.slice(0, 10);
             }).catch();
             // 获取最新推荐博客列表
             axios.get("blogs/latestThree", {
@@ -344,9 +356,11 @@
                 this.latestBlogList = data;
             }).catch();
             // 获取管理员对象
-            axios.get("/users").then(({data}) => {
-                this.admin = data;
-            }).catch();
+            axios.get("/users").then(() => {
+                this.isAdmin = true;
+            }).catch(() => {
+                this.isAdmin = false;
+            });
         },
         methods: {
             prev() {

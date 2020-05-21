@@ -7,6 +7,9 @@ spring:
   servlet:
     multipart:
       max-file-size: 5MB # 限制文件上传的大小
+  datasource:
+    hikari:
+      max-lifetime: 30000
 mybatis:
   type-aliases-package: your entity package location
 fdfs:

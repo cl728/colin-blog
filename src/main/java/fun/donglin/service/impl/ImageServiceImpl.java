@@ -60,7 +60,7 @@ public class ImageServiceImpl implements ImageService {
             StorePath storePath = this.storageClient.uploadFile( file.getInputStream(), file.getSize(), ext, null );
 
             //生成url地址
-            String link = "http://134.175.237.101/" + storePath.getFullPath();
+            String link = "http://your-remote-server-ip/" + storePath.getFullPath();
 
             // 存储到数据库中
             Image record = new Image();

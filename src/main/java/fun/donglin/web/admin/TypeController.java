@@ -97,20 +97,6 @@ public class TypeController {
     }
 
     /**
-     * 查询前六条分类
-     *
-     * @return 前六条分类的列表
-     */
-    @GetMapping("types/firstSix")
-    public ResponseEntity<List<Type>> findFirstSix() {
-        List<Type> types = this.typeService.findFirstSix();
-        if (CollectionUtils.isEmpty( types )) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok( types );
-    }
-
-    /**
      * 保存分类实体类
      *
      * @param type 要保存的分类实体类

@@ -22,6 +22,4 @@ public interface TypeService {
     List<Type> findAllWithBlogList();
 
     Type findByName(String name);
-
-    List<Type> findFirstSix();
 }

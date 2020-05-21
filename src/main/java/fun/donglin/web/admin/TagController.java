@@ -95,21 +95,6 @@ public class TagController {
     }
 
     /**
-     * 查询前十条标签
-     *
-     * @return 前十条标签的列表
-     */
-    @GetMapping("tags/firstTen")
-    public ResponseEntity<List<Tag>> findFirstTen() {
-        List<Tag> tags = this.tagService.findFirstTen();
-        if (CollectionUtils.isEmpty( tags )) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok( tags );
-    }
-
-
-    /**
      * 保存标签实体类
      *
      * @param tag 要保存的标签实体类
