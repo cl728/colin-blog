@@ -3,9 +3,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://your-remote-server-ip-or-domain-name:your-remote-database-port/blog?serverTimezone=Asia/Shanghai&characterEncoding=utf-8
-    username: your remote database username
-    password: your remote database password
+    url: ENC(XU3IJ2x4kfUAKvBBI3hElSp+6MSdm7vJb9xKS+DeDsM3NHx815S8ahybOiX2OfluM4GBF9eDRIT8VZRMd+x4FyDXKkZMb24S9o91tAClsUCS/KYAF0gfb1ICPjUkK2nvtdgywOBR6dg=)
+    username: ENC(aaq+Wjg1D1Z2cQGTwZeidA==)
+    password: ENC(ggQPxMX7xD7eV2gA+GiPTm9Mm9+W6vso)
 logging:
   level:
     root: warn
